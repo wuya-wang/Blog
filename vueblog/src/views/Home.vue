@@ -12,7 +12,7 @@
           <el-submenu index="1">
             <template slot="title">
               <i class="el-icon-user" ></i>
-              <span>Admin</span>
+              <span>{{ userinfo.username }}</span>
             </template>
             <el-menu-item-group>
               <el-menu-item index="1-1">个人中心</el-menu-item>
@@ -60,6 +60,7 @@
 export default {
   data() {
     return {
+      userinfo: this.$store.state.userinfo,
       screenWidth: document.body.clientWidth,
       Aside:'',
       minAside:'',

@@ -20,4 +20,5 @@ urlpatterns = [
     # 用户管理
     path('login/', views.login),  # 登录
     path('register/', views.register),  # 注册
+    path('uniqueness/', views.uniqueness),   # 提前验证邮箱与用户名唯一性
 ]

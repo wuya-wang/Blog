@@ -27,7 +27,7 @@
                 </div>
                 <span><a href="#">Forget?</a></span>
               </div>
-              <el-button class="login__button" type="text">Let's go</el-button>
+              <el-button class="login__button" type="text" @click="loginUser()">Let's go</el-button>
             </el-card>
           </div>
         </el-col>
@@ -36,6 +36,7 @@
   </div>
 </template>
 <script>
+
 export default {
   name: "Login",
   data(){
@@ -51,16 +52,28 @@ export default {
   methods:{
     // 输入框焦点事件
     inUsername(){this.focusUsername = true},
-    outUsername(){if (this.userinfo.username === ''){this.focusUsername = false}},
+    outUsername(){if (this.userinfo.username.length===0){this.focusUsername = false}},
     inPassword(){this.focusPassword = true},
-    outPassword(){if (this.userinfo.password === ''){this.focusPassword = false}},
+    outPassword(){if (this.userinfo.password.length===0){this.focusPassword = false}},
     goRegister(){
       this.$router.push({name:'Register'})
     },
     goLogin(){
       this.$router.push({name:'Login'})
     },
+    loginUser(){
+      if (this.userinfo.username.length===0 || this.userinfo.password.length===0){
+        this.$message({
+          showClose: true,
+          message: '用户名或密码为空',
+          type: 'error',
+          center: true,
+        });
+        return
+      }
+      this.$store.dispatch('loginUser', this.userinfo)
 
+    }
   },
 }
 </script>

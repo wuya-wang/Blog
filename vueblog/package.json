@@ -29,7 +29,8 @@
     "popper.js": "^1.16.1",
     "qs": "^6.9.6",
     "vue-template-compiler": "^2.6.11",
-    "vue-wechat-title": "^2.0.7"
+    "vue-wechat-title": "^2.0.7",
+    "vuex-persistedstate": "^4.0.0-beta.3"
   },
   "eslintConfig": {
     "root": true,

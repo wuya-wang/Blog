@@ -64,13 +64,49 @@ export default {
   methods:{
     // 输入框焦点事件
     inEmail(){this.focusEmail = true},
-    outEmail(){if (this.userinfo.email === ''){this.focusEmail = false}},
+    outEmail(){if (this.userinfo.email.length === 0){this.focusEmail = false}else {
+      axios({
+        url:'http://127.0.0.1:9999/api/uniqueness/',
+        method: 'post',
+        data: Qs.stringify({
+          email: this.userinfo.email,
+        })
+      }).then((res) =>{
+        if (res.data === '邮箱已被注册'){
+          this.$message({
+          showClose: true,
+          message: '邮箱已被注册',
+          type: 'error',
+          center: true,
+        });
+        return
+        }
+      })
+    }},
     inUsername(){this.focusUsername = true},
-    outUsername(){if (this.userinfo.username === ''){this.focusUsername = false}},
+    outUsername(){if (this.userinfo.username.length === 0){this.focusUsername = false}else {
+      axios({
+        url:'http://127.0.0.1:9999/api/uniqueness/',
+        method: 'post',
+        data: Qs.stringify({
+          username: this.userinfo.username,
+        })
+      }).then((res) =>{
+        if (res.data === '用户名已被使用'){
+          this.$message({
+          showClose: true,
+          message: '用户名已被使用',
+          type: 'error',
+          center: true,
+        });
+        return
+        }
+      })
+    }},
     inPassword(){this.focusPassword = true},
-    outPassword(){if (this.userinfo.password === ''){this.focusPassword = false}},
+    outPassword(){if (this.userinfo.password.length === 0){this.focusPassword = false}},
     inReward(){this.focusReward = true},
-    outReward(){if (this.userinfo.reward === ''){this.focusReward = false}},
+    outReward(){if (this.userinfo.reward.length === 0){this.focusReward = false}},
     goRegister(){
       this.$router.push({name:'Register'})
     },
@@ -85,7 +121,11 @@ export default {
       let username = /^[a-zA-Z0-9_-]{4,16}$/;
       // 密码正则
       let password = /^.*(?=.{8,})(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&*?.]).*$/;
-      if (this.userinfo.email === ''||this.userinfo.username=== ''||this.userinfo.password=== ''||this.userinfo.reward=== ''){
+      if (this.userinfo.email.length === 0||
+          this.userinfo.username.length === 0||
+          this.userinfo.password.length === 0||
+          this.userinfo.reward.length === 0
+      ){
         this.$message({
           showClose: true,
           message: '请先填写完整',
@@ -137,6 +177,7 @@ export default {
           email: this.userinfo.email,
           username: this.userinfo.username,
           password: this.userinfo.password,
+          reward: this.userinfo.reward,
         })
       }).then((res) => {
         console.log(res.data)
