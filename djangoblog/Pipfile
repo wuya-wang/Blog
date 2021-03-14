@@ -1,0 +1,20 @@
+[[source]]
+#url = "https://pypi.python.org/simple"
+#url ='http://mirrors.aliyun.com/pypi/simple'
+url ='https://pypi.tuna.tsinghua.edu.cn/simple/'
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pymysql = "*"
+beautifulsoup4 = "*"
+djangorestframework = "*"
+markdown = "*"
+django-filter = "*"
+pillow = "*"
+django-cors-headers = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"
