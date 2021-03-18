@@ -145,6 +145,7 @@ AUTH_USER_MODEL = 'blog.User'
 
 # 添加白名单
 CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8081",
     "http://localhost:8080",
     "http://127.0.0.1:9000",
     "http://127.0.0.1:9999",

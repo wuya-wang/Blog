@@ -170,18 +170,7 @@ export default {
         });
         return
       }
-      axios({
-        url:'http://127.0.0.1:9999/api/register/',
-        method:'post',
-        data:Qs.stringify({
-          email: this.userinfo.email,
-          username: this.userinfo.username,
-          password: this.userinfo.password,
-          reward: this.userinfo.reward,
-        })
-      }).then((res) => {
-        console.log(res.data)
-      })
+      this.$store.dispatch('registerUser', this.userinfo)
     },
   }
 }
@@ -278,6 +267,7 @@ p{
 .input.focus::after{
   top: -85%;
   transition: all .5s;
+  pointer-events:none;
 }
 .login__button{
   position:relative;

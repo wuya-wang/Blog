@@ -27,7 +27,7 @@
                 </div>
                 <span><a href="#">Forget?</a></span>
               </div>
-              <el-button class="login__button" type="text" @click="loginUser()">Let's go</el-button>
+              <el-button class="login__button" type="text" @click="loginUser()" @keyup.enter="loginUser()" >Let's go</el-button>
             </el-card>
           </div>
         </el-col>
@@ -142,8 +142,8 @@ p{
   }
 }
 .el-card {
-    border: 1px solid #f4b2ce30;
-    background-color: #f4b2ce50;
+  border: 1px solid #f4b2ce30;
+  background-color: #f4b2ce50;
 }
 .login__card_title{
   text-align: center;
@@ -164,10 +164,12 @@ p{
   font-size: 1.4rem;
   color: #ba6a71;
   transition: all .5s;
+  pointer-events:none;
 }
 .input.focus::after{
   top: -85%;
   transition: all .5s;
+  pointer-events:none;
 }
 .form span{
   margin-left: 1.5rem;

@@ -41,6 +41,7 @@ export default new Vuex.Store({
   //  actions中的回调函数的第一个参数是context, 是一个与store实例具有相同属性和方法的对象
   //  使用store.dispatch()调用actions中回调函数
   actions: {
+    // 登录
     loginUser({commit}, userinfo){
       axios({
         url: 'http://127.0.0.1:9999/api/login/',
@@ -48,19 +49,20 @@ export default new Vuex.Store({
         data: Qs.stringify(userinfo)
       }).then((res) => {
         // console.log(res.data)
-        if (res.data === '邮箱未注册'){
-          this.$message({
+        if (res.data === '用户名不存在'){
+          Vue.prototype.$message({
             showClose: true,
-            message: '邮箱未注册',
+            message: '用户名不存在',
             type: 'error',
             center: true,
           });
           return;
         }
         if (res.data === '密码错误'){
-          this.$message({
+          // 不使用全局就将组件中的this传递过来
+          Vue.prototype.$message({
             showClose: true,
-            message: '邮箱未注册',
+            message: '密码错误',
             type: 'error',
             center: true,
           });
@@ -68,12 +70,71 @@ export default new Vuex.Store({
         }
         commit('saveUserinfo', res.data)
         // 缓存
-        console.log(res.data)
         localStorage.setItem('token',res.data.token)
         $router.push({path: '/'}).then(()=>{});
       })
+    },
+    // 注册
+    registerUser({commit}, userinfo){
+    axios({
+      url:'http://127.0.0.1:9999/api/register/',
+      method:'post',
+      data:Qs.stringify(userinfo)
+    }).then((res) => {
+      if (res.data === 'error_email'){
+        Vue.prototype.$message({
+          showClose: true,
+          message: '邮箱格式错误',
+          type: 'error',
+          center: true,
+        });
+        return;
+      }
+      if (res.data === 'error_username'){
+        Vue.prototype.$message({
+          showClose: true,
+          message: '用户名格式错误',
+          type: 'error',
+          center: true,
+        });
+        return;
+      }
+      if (res.data === 'error_password'){
+        Vue.prototype.$message({
+          showClose: true,
+          message: '密码错误',
+          type: 'error',
+          center: true,
+        });
+        return;
+      }
+      if (res.data === '密码不一致'){
+        Vue.prototype.$message({
+          showClose: true,
+          message: '密码不一致',
+          type: 'error',
+          center: true,
+        });
+        return;
+      }
+      commit('saveUserinfo', res.data)
+      localStorage.setItem('token', res.data.token)
+      $router.push({path: '/'}).then(()=>{});
+    })
+  },
+    // 登出
+    logout({commit},token){
+      axios({
+        url:'http://127.0.0.1:9999/api/logout/',
+        method:'post',
+        data:Qs.stringify({token})
+      }).then()
+      commit('clearUserinfo')
+      localStorage.removeItem('token')
+      $router.push({name:'Login'}).then(()=>{})
     }
   },
+
   modules: {
   },
 

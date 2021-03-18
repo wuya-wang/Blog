@@ -20,5 +20,9 @@ urlpatterns = [
     # 用户管理
     path('login/', views.login),  # 登录
     path('register/', views.register),  # 注册
+    path('logout/', views.logout),  # 登出
     path('uniqueness/', views.uniqueness),   # 提前验证邮箱与用户名唯一性
+    path('changepassword/', views.change_password),  # 修改密码
+    # 文章管理
+    path('add-article/', views.add_article),
 ]

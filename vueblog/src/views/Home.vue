@@ -16,10 +16,10 @@
             </template>
             <el-menu-item-group>
               <el-menu-item index="1-1">个人中心</el-menu-item>
-              <el-menu-item index="1-2">登出</el-menu-item>
+              <el-menu-item @click="logout()">登出</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
-          <el-menu-item index="2">
+          <el-menu-item index='/blog'>
             <i class="el-icon-menu"></i>
             <span slot="title">个人博客</span>
           </el-menu-item>
@@ -35,9 +35,25 @@
               <el-menu-item index="3-4">选项2</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
-          <el-menu-item index="4">
+          <el-menu-item index="/add-article">
             <i class="el-icon-setting"></i>
-            <span slot="title">导航四</span>
+            <span slot="title">文章编辑</span>
+          </el-menu-item>
+          <el-submenu index="5">
+            <template slot="title">
+              <i class="el-icon-user"></i>
+              <span>管理员</span>
+            </template>
+            <el-menu-item-group>
+              <el-menu-item index="5-1">文章管理</el-menu-item>
+              <el-menu-item index="5-2">用户管理</el-menu-item>
+              <el-menu-item index="5-3">管理</el-menu-item>
+              <el-menu-item index="5-4">管理</el-menu-item>
+            </el-menu-item-group>
+          </el-submenu>
+          <el-menu-item index="6">
+            <i class="el-icon-setting"></i>
+            <span slot="title">里世界</span>
           </el-menu-item>
         </el-menu>
       </div>
@@ -46,10 +62,12 @@
           <div>
             <i @click="setAside()" class="el-icon-more-outline" :class="{'mobile-icon':mobileIcon, 'pc-icon':pcIcon, 'el-icon':elIcon}"></i>
           </div>
+          1231564
         </div>
         <div class="main">
+
           <router-view></router-view>
-          main</div>
+        </div>
         <div class="footer">footer</div>
       </div>
     </div>
@@ -60,6 +78,7 @@
 export default {
   data() {
     return {
+      conceal_main: true,
       userinfo: this.$store.state.userinfo,
       screenWidth: document.body.clientWidth,
       Aside:'',
@@ -132,7 +151,10 @@ export default {
           this.maxHeader = true
         }
       }
-    }
+    },
+    logout(){
+      this.$store.dispatch('logout',this.$store.getters.userLoginStatus)
+    },
   },
 }
 </script>
@@ -185,10 +207,11 @@ export default {
 .header {
   position: fixed;
   width: 100%;
+  top: 0;
   height: 56px;
   z-index: 1000;
   text-align: center;
-  background: rgb(255, 255, 255);
+  background: #f9d0e2;
   transition: all .5s;
 }
 .max-header{
@@ -199,25 +222,25 @@ export default {
 .main{
   position: relative;
   top: 56px;
-  padding: 0 10px;
-  height: 100vh;
+  margin-bottom: 112px;
+  padding: 0 10px;;
   z-index: 900;
-  background: rgb(207, 215, 226);
+  background: rgb(255, 255, 255);
 }
 .footer{
-  position: relative;
+  position: fixed;
   width: 100%;
   bottom: 0;
   padding: 0 10px;
   height: 56px;
   z-index: 1000;
-  background: rgb(207, 215, 226);
+  background: #f2a8c9;
 }
 .el-icon{
   position: absolute;
   left: -5px;
   padding: 10px 0;
-  color: cornflowerblue;
+  color: #ffffff;
   font-size: 36px;
   width: 56px;
   height: 56px;
@@ -228,7 +251,7 @@ export default {
   float: left;
   padding: 10px 0 ;
   margin-left: -5px;
-  color: cornflowerblue;
+  color: #fcfcfc;
   font-size: 40px;
   width: 56px;
   height: 56px;
@@ -245,4 +268,8 @@ export default {
   text-align: center;
   line-height: 0;
 }
+.el-menu-item.is-active {
+    color: #ffffff;
+}
+
 </style>

@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
-
+import store from '../store'
 Vue.use(VueRouter)
 
 const routes = [
@@ -13,13 +13,37 @@ const routes = [
         meta: {
             title: "浮生无涯"
         },
+        redirect: '/wakatime',
+        beforeEnter:(to, form, next) =>{
+            if (store.state.userinfo.token){
+                next()
+            } else {
+                next("/login")
+            }
+        },
         children:[
+            {
+                path:'/wakatime',
+                name:'WakaTime',
+                component:() => import('../components/WakaTime'),
+                meta: {
+                    title: "wakatime"
+                },
+            },
             {
                 path:'/blog',
                 name:'Blog',
                 component:() => import('../components/Blog'),
                 meta: {
                     title: "博客"
+                },
+            },
+            {
+                path:'/add-article',
+                name:'AddArticle',
+                component:() => import('../components/AddArticle'),
+                meta: {
+                    title: "编辑"
                 },
             },
             {

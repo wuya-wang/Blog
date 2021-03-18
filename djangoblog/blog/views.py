@@ -1,5 +1,8 @@
+import base64
+import json
 import re
-from django.contrib.auth.hashers import check_password
+import time
+from django.contrib.auth.hashers import check_password, make_password
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -42,24 +45,24 @@ def register(request):
         return Response('error_password')
     if password != reward:
         return Response('密码不一致')
-    user = models.User(email=email, username=username, password=password)
+    new_password = make_password(password)
+    user = models.User(email=email, username=username, password=new_password)
     user.save()
     Token.objects.get_or_create(user=user)
     token = Token.objects.get(user=user)
     userinfo = {
-        'email': user.email,
-        'password': user.password,
+        'username': user.username,
         'token': token.key,
     }
     return Response(userinfo)
 
 
 @api_view(['POST'])
-def login(request):
+def login(request, ):
     username = request.POST.get('username')
     password = request.POST.get('password')
-    print(username, password)
     user = models.User.objects.filter(username=username)
+    print(user)
     if user:
         check_pwd = check_password(password, user[0].password)
         if check_pwd:
@@ -69,7 +72,7 @@ def login(request):
         else:
             return Response('密码错误')
     else:
-        return Response('邮箱未注册')
+        return Response('用户名不存在')
 
     userinfo = {
         'token': token.key,
@@ -78,5 +81,47 @@ def login(request):
     return Response(userinfo)
 
 
+@api_view(['POST'])
+def logout(request):
+    token = request.POST.get('token')
+    user_token = Token.objects.get(key=token)
+    user_token.delete()
+    return Response('登出')
 
 
+# 修改密码
+@api_view(['POST'])
+def change_password(request):
+    token = request.POST.get('token')
+    user_token = Token.objects.get(key=token)
+    user_token.delete()
+    return Response('登出')
+
+
+# 添加文章
+@api_view(['POST'])
+def add_article(request):
+    host = 'http://127.0.0.1:9999/'
+    img = request.POST.get('img')
+    if img is not None:
+        img = json.loads(img)
+        img_url = img['url']
+        img_name = img['name']
+        img_url_list = img_url.split(',')
+        img_data = base64.b64decode(img_url_list[1])
+        image_name = int(round(time.time() * 1000))
+        img_url = 'media/img' + '/' + str(image_name) + '-' + img_name
+        with open(img_url, 'wb') as f:
+            f.write(img_data)
+        return Response(host + img_url)
+    else:
+        pass
+    token = request.POST.get('token')
+    article_text = request.POST.get('article_text')
+    article_title = request.POST.get('article_title')
+    article_desc = request.POST.get('article_introduce')
+    user_token = Token.objects.get(key=token)
+    user = models.User.objects.get(id=user_token.user_id)
+    article = models.Article(title=article_title, desc=article_desc, text=article_text, article_user=user)
+    article.save()
+    return Response('OK')

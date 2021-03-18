@@ -8,8 +8,12 @@ import store from './store'
 import 'bootstrap/dist/css/bootstrap.css'
 import './assets/css/all.css'
 import './assets/iconfont/iconfont.css'
+import mavonEditor from 'mavon-editor'
+import 'mavon-editor/dist/css/index.css'
+
 
 Vue.use(VueWechatTitle)
+Vue.use(mavonEditor)
 Vue.use(ElementUI);
 Vue.config.productionTip = false
 
