@@ -37,6 +37,25 @@ const routes = [
                 meta: {
                     title: "博客"
                 },
+                redirect: '/article',
+                children:[
+                    {
+                        path: '/article-list',
+                        name: 'ArticleList',
+                        component: () => import('../components/ArticleList'),
+                        meta: {
+                            title: "文章列表"
+                        }
+                    },
+                    {
+                        path: '/article',
+                        name: 'Article',
+                        component: () => import('../components/Article'),
+                        meta: {
+                            title: "文章详情"
+                        }
+                    },
+                ]
             },
             {
                 path:'/add-article',

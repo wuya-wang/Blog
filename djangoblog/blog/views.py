@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from blog import models
 
 
+# 用户名邮箱验证
 @api_view(['POST'])
 def uniqueness(request):
     email = request.POST.get('email')
@@ -20,6 +21,7 @@ def uniqueness(request):
     return Response('OK')
 
 
+# 注册
 @api_view(['POST'])
 def register(request):
     email = request.POST['email']
@@ -57,6 +59,7 @@ def register(request):
     return Response(userinfo)
 
 
+# 登录
 @api_view(['POST'])
 def login(request, ):
     username = request.POST.get('username')
@@ -81,6 +84,7 @@ def login(request, ):
     return Response(userinfo)
 
 
+# 登出
 @api_view(['POST'])
 def logout(request):
     token = request.POST.get('token')
@@ -103,6 +107,7 @@ def change_password(request):
 def add_article(request):
     host = 'http://127.0.0.1:9999/'
     img = request.POST.get('img')
+    # 上传图片
     if img is not None:
         img = json.loads(img)
         img_url = img['url']
@@ -114,14 +119,46 @@ def add_article(request):
         with open(img_url, 'wb') as f:
             f.write(img_data)
         return Response(host + img_url)
-    else:
-        pass
+    # 添加文章
     token = request.POST.get('token')
     article_text = request.POST.get('article_text')
     article_title = request.POST.get('article_title')
     article_desc = request.POST.get('article_introduce')
     user_token = Token.objects.get(key=token)
     user = models.User.objects.get(id=user_token.user_id)
-    article = models.Article(title=article_title, desc=article_desc, text=article_text, article_user=user)
-    article.save()
+    article_data = models.Article(title=article_title, desc=article_desc, text=article_text, article_user=user)
+    article_data.save()
     return Response('OK')
+
+
+# 文章详情
+@api_view(['GET', "POST"])
+def article_data(request):
+    articles_data = []
+    articles = models.Article.objects.all()
+    for article in articles:
+        article_info = {
+            'article_title': article.title,
+            'article_text': article.text,
+            'article_time': article.create_time.strftime('%Y-%m-%d %H:%I:%S'),
+            'author': article.article_user.username,
+        }
+        articles_data.append(article_info)
+    return Response(articles_data)
+
+
+# 文章列表
+@api_view(['GET'])
+def article_list(request):
+    article_list_data = []
+    articles = models.Article.objects.all().order_by('id')
+    for article in articles:
+        article_info = {
+            'article_id': article.id,
+            'article_title': article.title,
+            'article_desc': article.desc,
+            'article_time': article.create_time.strftime('%Y-%m-%d %H:%I:%S'),
+            'author': article.article_user.username,
+        }
+        article_list_data.append(article_info)
+    return Response(article_list_data)

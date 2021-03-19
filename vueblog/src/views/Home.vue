@@ -66,9 +66,8 @@
         </div>
         <div class="main">
 
-          <router-view></router-view>
+          <router-view v-wechat-title="$route.meta.title"></router-view>
         </div>
-        <div class="footer">footer</div>
       </div>
     </div>
   </div>
@@ -222,7 +221,7 @@ export default {
 .main{
   position: relative;
   top: 56px;
-  margin-bottom: 112px;
+  margin-bottom: 56px;
   padding: 0 10px;;
   z-index: 900;
   background: rgb(255, 255, 255);

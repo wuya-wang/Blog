@@ -139,13 +139,15 @@ name: "AddArticle",
         })
       }).then((res) => {
         if (res.data === 'OK'){
-          this.value = ''
           this.$message({
             showClose: true,
             message: '保存成功',
             type: 'success',
             center: true,
           });
+          this.value = ''
+          this.article.title = ''
+          this.article.introduce = ''
           return;
         }
       })

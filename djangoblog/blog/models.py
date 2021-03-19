@@ -23,3 +23,27 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
+
+
+# 文章分类
+class Category(models.Model):
+    category = models.CharField(max_length=32, verbose_name='分类标题')
+    relation = models.ForeignKey(
+        'Article', on_delete=models.SET_NULL, blank=True, null=True,
+        related_name='article_category'
+    )
+
+    def __str__(self):
+        return self.category
+
+
+# 文章标签
+class Tag(models.Model):
+    tag = models.CharField(max_length=32, verbose_name='标签')
+    relation = models.ManyToManyField(
+        "Article", blank=True, null=True,
+        related_name='article_tag'
+    )
+
+    def __str__(self):
+        return self.tag

@@ -24,5 +24,7 @@ urlpatterns = [
     path('uniqueness/', views.uniqueness),   # 提前验证邮箱与用户名唯一性
     path('changepassword/', views.change_password),  # 修改密码
     # 文章管理
-    path('add-article/', views.add_article),
+    path('add-article/', views.add_article),  # 添加文章
+    path('article/', views.article_data),  # 文章详情
+    path('article-list/', views.article_list),  # 文章列表
 ]
