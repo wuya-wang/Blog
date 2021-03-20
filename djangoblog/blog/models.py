@@ -20,6 +20,9 @@ class Article(models.Model):
     text = models.TextField(verbose_name='内容')
     create_time = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
     article_user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, verbose_name='文章作者')
+    article_category = models.ForeignKey(
+        'Category', on_delete=models.SET_NULL, blank=True, null=True,
+        related_name='article_category')
 
     def __str__(self):
         return self.title
@@ -28,10 +31,6 @@ class Article(models.Model):
 # 文章分类
 class Category(models.Model):
     category = models.CharField(max_length=32, verbose_name='分类标题')
-    relation = models.ForeignKey(
-        'Article', on_delete=models.SET_NULL, blank=True, null=True,
-        related_name='article_category'
-    )
 
     def __str__(self):
         return self.category
@@ -40,7 +39,7 @@ class Category(models.Model):
 # 文章标签
 class Tag(models.Model):
     tag = models.CharField(max_length=32, verbose_name='标签')
-    relation = models.ManyToManyField(
+    article_tag = models.ManyToManyField(
         "Article", blank=True, null=True,
         related_name='article_tag'
     )

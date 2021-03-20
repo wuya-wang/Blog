@@ -12,9 +12,10 @@
           <el-submenu index="1">
             <template slot="title">
               <i class="el-icon-user" ></i>
-              <span>{{ userinfo.username }}</span>
+              <span v-if="userinfo.username" v-text="userinfo.username "></span>
+              <span v-else v-text="username"></span>
             </template>
-            <el-menu-item-group>
+            <el-menu-item-group v-if="this.$store.getters.userLoginStatus">
               <el-menu-item index="1-1">个人中心</el-menu-item>
               <el-menu-item @click="logout()">登出</el-menu-item>
             </el-menu-item-group>
@@ -63,6 +64,16 @@
             <i @click="setAside()" class="el-icon-more-outline" :class="{'mobile-icon':mobileIcon, 'pc-icon':pcIcon, 'el-icon':elIcon}"></i>
           </div>
           1231564
+          <div class="home__navbar" v-if="!(this.$store.getters.userLoginStatus)">
+            <div class="navbar-register" @click="goRegister()">
+              <i class="iconfont icon-zhuce"></i>
+              <p>REGISTER</p>
+            </div>
+            <div class="navbar-login" @click="goLogin()">
+              <i class="iconfont icon-zhiwendenglu"></i>
+              <p>LOGIN</p>
+            </div>
+          </div>
         </div>
         <div class="main">
 
@@ -77,6 +88,7 @@
 export default {
   data() {
     return {
+      username:'游客',
       conceal_main: true,
       userinfo: this.$store.state.userinfo,
       screenWidth: document.body.clientWidth,
@@ -153,6 +165,12 @@ export default {
     },
     logout(){
       this.$store.dispatch('logout',this.$store.getters.userLoginStatus)
+    },
+    goRegister(){
+      this.$router.push({name:'Register'})
+    },
+    goLogin(){
+      this.$router.push({name:'Login'})
     },
   },
 }
@@ -270,5 +288,44 @@ export default {
 .el-menu-item.is-active {
     color: #ffffff;
 }
-
+.home__navbar{
+  position: absolute;
+  display: flex;
+  right: 0;
+  top: 0;
+  padding: 13px 10px;
+  z-index: 10;
+}
+.navbar-register{
+  display: flex;
+  margin: 0 10px;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.navbar-login{
+  display: flex;
+  margin: 0 10px;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.navbar-register p,
+.navbar-login p{
+  margin: 0 5px;
+}
+.navbar-register:hover,
+.navbar-login:hover{
+  color: #ba6a71;
+  background-color: #ba6a7140;
+  border-radius: 8px;
+}
+.iconfont{
+  font-size: 20px;
+  margin: 0 5px;
+}
+p{
+  margin: 0;
+  line-height: 30px;
+}
 </style>

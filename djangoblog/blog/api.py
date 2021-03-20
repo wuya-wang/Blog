@@ -27,4 +27,6 @@ urlpatterns = [
     path('add-article/', views.add_article),  # 添加文章
     path('article/', views.article_data),  # 文章详情
     path('article-list/', views.article_list),  # 文章列表
+    path('category/', views.category),  # 分类
+    path('tag/', views.tag),  # 标签
 ]

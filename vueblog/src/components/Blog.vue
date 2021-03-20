@@ -8,7 +8,7 @@
               <span>分类</span>
             </div>
             <div v-for="(category, index) in category_list" :key="index" class="text item">
-              {{ category + index }}
+              <el-button class="blog__category_btn">{{ category }}</el-button>
             </div>
           </el-card>
           <el-card class="box-card tag" shadow="never">
@@ -16,19 +16,18 @@
               <span>标签</span>
             </div>
             <div v-for="(tag, index) in tag_list" :key="index">
-              <el-button type="primary" round>{{tag + index }}</el-button>
+              <el-button round class="blog__tag_btn">{{ tag }}</el-button>
             </div>
           </el-card>
-          <el-card class="box-card" shadow="never">
+          <el-card class="box-card time" shadow="never">
             <div slot="header" class="clearfix">
               <span>时间</span>
             </div>
-            <div v-for="o in 4" :key="o" class="text item">
-              {{'列表内容 ' + o }}
+            <div v-for="(time, index) in time_list" :key="index">
+              <el-button round class="blog__time_btn">{{ time }}</el-button>
             </div>
           </el-card>
-          <el-button type="primary" round @click="getAllArticle()">全部文章</el-button>
-          <ArticleList :get-all-article="getAllArticle"></ArticleList>
+          <el-button class="blog__all_article_btn" round @click=" toArticleList()">全部文章</el-button>
         </div>
       </el-col>
       <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl='12' style="margin-top: 10px">
@@ -61,25 +60,26 @@
 
 <script>
 import axios from "axios";
-import ArticleList from "@/components/ArticleList";
 export default {
   name: "Blog",
   data() {
     return {
+      // articleList:'',
       category_list: [
         '前端', '后端', 'Python', 'Java'
       ],
       tag_list: [
         '数据库', 'Vue', 'Django', '网络协议',
       ],
-
+      time_list:[
+          '2021-3', '2021-2', '2021-1'
+      ]
     }
   },
   created() {
     this.getCategoryAndTag()
   },
   components:{
-    ArticleList,
   },
   methods: {
     getCategoryAndTag(){
@@ -88,25 +88,36 @@ export default {
         method:'get',
       }).then((res) => {
         console.log(res.data)
+
       })
     },
-    getAllArticle(){
-      axios({
-        url:'http://127.0.0.1:9999/api/article-list/',
-        method:'get',
-        params: {
-          category: 'all'
-        },
-      }).then((res) => {
-        console.log(res.data)
-      })
+    toArticleList(){
+      this.$router.push({name:'ArticleList'})
     }
+
   },
 }
 </script>
 
 <style scoped>
 .box-card{
+  margin-top: 10px;
+}
+#blog >>> .el-card__body {
+    padding: 5px 10px;
+}
+#blog >>> .blog__category_btn {
+  width: 100%;
+  margin: 5px 0;
+  padding: 8px 20px;
+  font-size: 16px;
+}
+#blog >>> .el-button.is-round {
+    border-radius: 20px;
+    padding: 10px 23px;
+}
+.blog__all_article_btn{
+  width: 100%;
   margin-top: 10px;
 }
 .article-icon{
@@ -116,5 +127,8 @@ export default {
   display: inline-block;
   margin: 3px;
 }
-
+#blog >>> .time .el-card__body div{
+  display: inline-block;
+  margin: 3px;
+}
 </style>

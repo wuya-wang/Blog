@@ -124,27 +124,41 @@ def add_article(request):
     article_text = request.POST.get('article_text')
     article_title = request.POST.get('article_title')
     article_desc = request.POST.get('article_introduce')
+    article_category = request.POST.get('article_category')
+    article_tag = request.POST.get('article_tag')
+    # print(article_text,article_title,article_desc,article_category,article_tag)
     user_token = Token.objects.get(key=token)
     user = models.User.objects.get(id=user_token.user_id)
-    article_data = models.Article(title=article_title, desc=article_desc, text=article_text, article_user=user)
-    article_data.save()
+
+    article_info = models.Article(
+        title=article_title, desc=article_desc, text=article_text,
+        article_user=user, article_category=article_category, article_tag=article_tag)
+    article_info.save()
     return Response('OK')
 
 
 # 文章详情
 @api_view(['GET', "POST"])
 def article_data(request):
-    articles_data = []
-    articles = models.Article.objects.all()
-    for article in articles:
+    article_id = request.GET.get("id")
+    top_article_id = request.GET.get("top_article_id")
+    if article_id is not None:
+        article = models.Article.objects.get(id=article_id)
         article_info = {
             'article_title': article.title,
             'article_text': article.text,
             'article_time': article.create_time.strftime('%Y-%m-%d %H:%I:%S'),
             'author': article.article_user.username,
         }
-        articles_data.append(article_info)
-    return Response(articles_data)
+    else:
+        article = models.Article.objects.get(id=top_article_id)
+        article_info = {
+            'article_title': article.title,
+            'article_text': article.text,
+            'article_time': article.create_time.strftime('%Y-%m-%d %H:%I:%S'),
+            'author': article.article_user.username,
+        }
+    return Response(article_info)
 
 
 # 文章列表
@@ -162,3 +176,41 @@ def article_list(request):
         }
         article_list_data.append(article_info)
     return Response(article_list_data)
+
+
+# 分类
+@api_view(['GET', 'POST'])
+def category(request):
+    if request.method == 'GET':
+        category_data = []
+        categorys = models.Category.objects.all()
+        for i in categorys:
+            category_info = {
+                'value': i.category,
+                'label': i.category,
+            }
+            category_data.append(category_info)
+        return Response(category_data)
+    if request.method == 'POST':
+        new_category = request.POST.get('new_category')
+        models.Category(category=new_category).save()
+    return Response('ok')
+
+
+# 标签
+@api_view(['GET', 'POST'])
+def tag(request):
+    if request.method == 'GET':
+        tag_data = []
+        tags = models.Tag.objects.all()
+        for i in tags:
+            tag_info = {
+                'value': i.tag,
+                'label': i.tag,
+            }
+            tag_data.append(tag_info)
+        return Response(tag_data)
+    if request.method == 'POST':
+        new_tag = request.POST.get('new_tag')
+        models.Tag(tag=new_tag).save()
+    return Response('ok')

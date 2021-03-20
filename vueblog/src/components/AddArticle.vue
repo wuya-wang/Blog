@@ -3,22 +3,66 @@
     <el-row :gutter="10">
       <el-col :xs="24" :sm="24" :md="24" :lg="5" :xl="5">
         <div class="add-article__input">
-          <el-input
-              placeholder="请输入内容"
-              v-model="article.title"
-              clearable>
-          </el-input>
-          <el-input
-              type="textarea"
-              :rows="2"
-              placeholder="请输入内容"
-              v-model="article.introduce">
-          </el-input>
-          <el-cascader
-              v-model="category"
-              :options="options"
-              @change="handleChange">
-          </el-cascader>
+          <div>
+            <div class="add-article__header">标题</div>
+            <el-input
+                placeholder="请输入内容"
+                v-model="article.title"
+                clearable>
+            </el-input>
+          </div>
+          <el-divider content-position="right">我是分割线</el-divider>
+          <div>
+            <div class="add-article__header">简介</div>
+            <el-input
+                type="textarea"
+                :rows="2"
+                placeholder="请输入内容"
+                v-model="article.introduce">
+            </el-input>
+          </div>
+          <el-divider></el-divider>
+          <div>
+            <div class="add-article__header">分类</div>
+            <el-select v-model="category_value" placeholder="请选择">
+              <el-option
+                  v-for="item in category"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+              </el-option>
+            </el-select>
+            <div>
+              <el-input
+                  style="display: inline-block; width: calc(100% - 75px)"
+                  placeholder="新建分类"
+                  v-model="add_category_value"
+                  clearable>
+              </el-input>
+              <el-button style="margin-left: 5px;" @click="addCategory()">确定</el-button>
+            </div>
+          </div>
+          <el-divider></el-divider>
+          <div>
+            <div class="add-article__header">标签</div>
+            <el-select v-model='tag_value' placeholder="请选择">
+              <el-option
+                  v-for="item in tag"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+              </el-option>
+            </el-select>
+            <div>
+              <el-input
+                  style="display: inline-block; width: calc(100% - 75px)"
+                  placeholder="新建标签"
+                  v-model="add_tag_value"
+                  clearable>
+              </el-input>
+              <el-button style="margin-left: 5px;" @click="addTag()">确定</el-button>
+            </div>
+          </div>
         </div>
       </el-col>
       <el-col :xs="24" :sm="24" :md="24" :lg="19" :xl="19">
@@ -30,7 +74,7 @@
               :boxShadow="false"
               @save="saveArticle"
               @imgAdd="$imgAdd"
-              v-model="value"
+              v-model="article_value"
           />
     </div>
       </el-col>
@@ -45,19 +89,28 @@ export default {
 name: "AddArticle",
    data() {
     return {
-      value:'',
+      article_value:'',
       handbook: "",
       article:{
         title:'',
         introduce:'',
       },
-      category:[],
-      options:[
+      category:[
         {
-          value: '指南',
+          value: '数据指南',
           label: '指南',
+        },
+      ],
+      category_value:'',
+      add_category_value:'',
+      tag:[
+        {
+          value: '数据Python',
+          label: 'Python',
         }
       ],
+      tag_value: '',
+      add_tag_value: "",
       img_list: {},
       markdownOption: {
         bold: true, // 粗体
@@ -97,6 +150,8 @@ name: "AddArticle",
     }
   },
   created() {
+    this.getCategory()
+    this.getTag()
   },
   methods:{
     // 保存文章
@@ -119,7 +174,7 @@ name: "AddArticle",
         });
         return
       }
-      if (this.value.length === 0){
+      if (this.article_value.length === 0){
         this.$message({
           showClose: true,
           message: '内容不能为空',
@@ -136,6 +191,8 @@ name: "AddArticle",
           article_text: render,
           article_title: this.article.title,
           article_introduce: this.article.introduce,
+          article_category: this.category_value,
+          article_tag: this.tag_value,
         })
       }).then((res) => {
         if (res.data === 'OK'){
@@ -145,10 +202,11 @@ name: "AddArticle",
             type: 'success',
             center: true,
           });
-          this.value = ''
+          this.article_value = ''
           this.article.title = ''
           this.article.introduce = ''
-          return;
+          this.category_value = ''
+          this.tag_value = ''
         }
       })
     },
@@ -169,8 +227,75 @@ name: "AddArticle",
         this.$refs.md.$img2Url(pos, url.data)
       })
     },
-    handleChange(value) {
-      console.log(value);
+    getCategory(){
+      axios({
+        url:'http://127.0.0.1:9999/api/category/',
+        method:'get',
+      }).then((res) => {
+        this.category = res.data
+      })
+    },
+    addCategory(){
+      if (this.add_category_value.length === 0) {
+        this.$message({
+          showClose: true,
+          message: '新增分类不能为空',
+          type: 'warning',
+          center: true,
+        });
+        return
+      }
+      axios({
+        url:'http://127.0.0.1:9999/api/category/',
+        method:'post',
+        data:Qs.stringify({
+          "new_category": this.add_category_value
+        })
+      }).then(() => {
+        this.$message({
+          showClose: true,
+          message: '新增分类成功',
+          type: 'success',
+          center: true,
+        });
+        this.add_category_value = ''
+        this.getCategory()
+      })
+    },
+    getTag(){
+      axios({
+        url:'http://127.0.0.1:9999/api/tag/',
+        method:'get',
+      }).then((res) => {
+        this.tag = res.data
+      })
+    },
+    addTag(){
+      if (this.add_tag_value.length === 0) {
+        this.$message({
+          showClose: true,
+          message: '新增标签不能为空',
+          type: 'warning',
+          center: true,
+        });
+        return
+      }
+      axios({
+        url:'http://127.0.0.1:9999/api/tag/',
+        method:'post',
+        data:Qs.stringify({
+          "new_tag": this.add_tag_value
+        })
+      }).then(() => {
+        this.$message({
+          showClose: true,
+          message: '新增标签成功',
+          type: 'success',
+          center: true,
+        });
+        this.add_tag_value = ''
+        this.getTag()
+      })
     },
   }
 }
@@ -178,7 +303,7 @@ name: "AddArticle",
 
 <style scoped>
 #add-article >>> .markdown-body{
-  min-height: calc(100vh - 111px) ;
+  min-height: calc(100vh - 56px) ;
 }
 #add-article >>> .markdown-body img {
     max-width: 50%;
@@ -190,5 +315,19 @@ name: "AddArticle",
 }
 .add-article__input{
   margin-top: 10px;
+}
+.add-article__header{
+  margin: 3px 0;
+  font-size: 18px;
+}
+#add-article >>> .el-divider--horizontal {
+    display: block;
+    height: 1px;
+    width: 100%;
+    margin: 15px 0;
+}
+#add-article >>> .el-select {
+  margin-bottom: 5px;
+    width: 100%;
 }
 </style>

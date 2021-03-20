@@ -370,7 +370,7 @@
     <table id="172" parent="2" name="blog_article"/>
     <table id="173" parent="2" name="blog_category"/>
     <table id="174" parent="2" name="blog_tag"/>
-    <table id="175" parent="2" name="blog_tag_relation"/>
+    <table id="175" parent="2" name="blog_tag_article_tag"/>
     <table id="176" parent="2" name="blog_user"/>
     <table id="177" parent="2" name="blog_user_dg_tmp"/>
     <table id="178" parent="2" name="blog_user_groups"/>
@@ -1504,51 +1504,51 @@ codename</ColNames>
       <DataType>datetime|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <index id="533" parent="172" name="blog_article_article_user_id_3eb8f1e8">
+    <column id="533" parent="172" name="article_category_id">
+      <Position>7</Position>
+      <DataType>integer|0s</DataType>
+    </column>
+    <index id="534" parent="172" name="blog_article_article_user_id_3eb8f1e8">
       <ColNames>article_user_id</ColNames>
       <ColumnCollations></ColumnCollations>
     </index>
-    <key id="534" parent="172">
+    <index id="535" parent="172" name="blog_article_article_category_id_2996aaee">
+      <ColNames>article_category_id</ColNames>
+      <ColumnCollations></ColumnCollations>
+    </index>
+    <key id="536" parent="172">
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="535" parent="172">
+    <foreign-key id="537" parent="172">
       <ColNames>article_user_id</ColNames>
       <RefTableName>blog_user</RefTableName>
       <RefColNames>id</RefColNames>
       <Deferrable>1</Deferrable>
       <InitiallyDeferred>1</InitiallyDeferred>
     </foreign-key>
-    <column id="536" parent="173" name="id">
+    <foreign-key id="538" parent="172">
+      <ColNames>article_category_id</ColNames>
+      <RefTableName>blog_category</RefTableName>
+      <RefColNames>id</RefColNames>
+      <Deferrable>1</Deferrable>
+      <InitiallyDeferred>1</InitiallyDeferred>
+    </foreign-key>
+    <column id="539" parent="173" name="id">
       <Position>1</Position>
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>null</SequenceIdentity>
     </column>
-    <column id="537" parent="173" name="category">
+    <column id="540" parent="173" name="category">
       <Position>2</Position>
       <DataType>varchar(32)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="538" parent="173" name="relation_id">
-      <Position>3</Position>
-      <DataType>integer|0s</DataType>
-    </column>
-    <index id="539" parent="173" name="blog_category_relation_id_317cee6e">
-      <ColNames>relation_id</ColNames>
-      <ColumnCollations></ColumnCollations>
-    </index>
-    <key id="540" parent="173">
+    <key id="541" parent="173">
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="541" parent="173">
-      <ColNames>relation_id</ColNames>
-      <RefTableName>blog_article</RefTableName>
-      <RefColNames>id</RefColNames>
-      <Deferrable>1</Deferrable>
-      <InitiallyDeferred>1</InitiallyDeferred>
-    </foreign-key>
     <column id="542" parent="174" name="id">
       <Position>1</Position>
       <DataType>integer|0s</DataType>
@@ -1580,17 +1580,17 @@ codename</ColNames>
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <index id="548" parent="175" name="blog_tag_relation_tag_id_article_id_f9ae49af_uniq">
+    <index id="548" parent="175" name="blog_tag_article_tag_tag_id_article_id_3641c691_uniq">
       <ColNames>tag_id
 article_id</ColNames>
       <ColumnCollations></ColumnCollations>
       <Unique>1</Unique>
     </index>
-    <index id="549" parent="175" name="blog_tag_relation_tag_id_c4616340">
+    <index id="549" parent="175" name="blog_tag_article_tag_tag_id_b90c8e5f">
       <ColNames>tag_id</ColNames>
       <ColumnCollations></ColumnCollations>
     </index>
-    <index id="550" parent="175" name="blog_tag_relation_article_id_c37deffd">
+    <index id="550" parent="175" name="blog_tag_article_tag_article_id_cc89fba5">
       <ColNames>article_id</ColNames>
       <ColumnCollations></ColumnCollations>
     </index>

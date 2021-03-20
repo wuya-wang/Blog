@@ -1,9 +1,9 @@
 <template>
   <div id="article-list">
     <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+      <div v-for="(article, index)  in article_list" :key="index" class="card-body">
+        <h5 class="card-title" @click="getArticle(article.article_id)">{{ article.article_title }}</h5>
+        <p class="card-text">{{ article.article_desc }}</p>
         <div>
           <p class="card-text" style="float: left">点赞</p>
           <div style="float: right">
@@ -29,10 +29,9 @@ export default {
     }
   },
   created() {
-
+    this.getArticleList()
   },
-  props:{
-    getAllArticle,
+  watch: {
   },
   methods:{
     getArticleList() {
@@ -40,8 +39,12 @@ export default {
         url: 'http://127.0.0.1:9999/api/article-list/',
         method: 'get',
       }).then((res) => {
-        console.log(res.data)
+        this.article_list = res.data
       })
+    },
+    getArticle(id){
+      console.log(id)
+      this.$router.push({name:'Article',query:{'id':id}})
     }
   },
 }

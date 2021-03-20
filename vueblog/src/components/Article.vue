@@ -14,6 +14,7 @@ export default {
   name: "Article",
   data(){
     return {
+      'id': this.$route.query.id,
       'article_text':'',
       'article_title':'',
     }
@@ -26,12 +27,15 @@ export default {
       axios({
         url: 'http://127.0.0.1:9999/api/article/',
         method: 'get',
+        params:{
+          top_article_id: 1,
+          id:this.id,
+        }
       }).then((res) => {
-        console.log(res.data)
-        this.article_title = res.data[0].article_title
-        this.article_text = res.data[0].article_text
+        this.article_title = res.data.article_title
+        this.article_text = res.data.article_text
       })
-    }
+    },
   }
 }
 </script>

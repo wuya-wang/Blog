@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
-import store from '../store'
+// import store from '../store'
 Vue.use(VueRouter)
 
 const routes = [
@@ -14,13 +14,13 @@ const routes = [
             title: "浮生无涯"
         },
         redirect: '/wakatime',
-        beforeEnter:(to, form, next) =>{
-            if (store.state.userinfo.token){
-                next()
-            } else {
-                next("/login")
-            }
-        },
+        // beforeEnter:(to, form, next) =>{
+        //     if (store.state.userinfo.token){
+        //         next()
+        //     } else {
+        //         next("/login")
+        //     }
+        // },
         children:[
             {
                 path:'/wakatime',
