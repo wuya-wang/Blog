@@ -129,10 +129,16 @@ def add_article(request):
     # print(article_text,article_title,article_desc,article_category,article_tag)
     user_token = Token.objects.get(key=token)
     user = models.User.objects.get(id=user_token.user_id)
-
+    # 存储外键与普通字段
+    article_category_data = models.Category.objects.get(category=article_category)
     article_info = models.Article(
         title=article_title, desc=article_desc, text=article_text,
-        article_user=user, article_category=article_category, article_tag=article_tag)
+        article_user=user, article_category=article_category_data)
+    article_info.save()
+    # 获取多对多关系字段
+    article_tag_data = models.Tag.objects.get(tag=article_tag)
+    # 使用add()方法存储多对多关系
+    article_info.article_tag.add(article_tag_data)
     article_info.save()
     return Response('OK')
 
@@ -164,18 +170,49 @@ def article_data(request):
 # 文章列表
 @api_view(['GET'])
 def article_list(request):
-    article_list_data = []
-    articles = models.Article.objects.all().order_by('id')
-    for article in articles:
-        article_info = {
-            'article_id': article.id,
-            'article_title': article.title,
-            'article_desc': article.desc,
-            'article_time': article.create_time.strftime('%Y-%m-%d %H:%I:%S'),
-            'author': article.article_user.username,
-        }
-        article_list_data.append(article_info)
-    return Response(article_list_data)
+    category_data = request.GET.get('category')
+    tag_data = request.GET.get('tag')
+    if category_data is not None:
+        article_list_data = []
+        category_id = models.Category.objects.get(category=category_data)
+        articles = models.Article.objects.filter(article_category=category_id).order_by('id')
+        for article in articles:
+            article_info = {
+                'article_id': article.id,
+                'article_title': article.title,
+                'article_desc': article.desc,
+                'article_time': article.create_time.strftime('%Y-%m-%d %H:%I:%S'),
+                'author': article.article_user.username,
+            }
+            article_list_data.append(article_info)
+        return Response(article_list_data)
+    if tag_data is not None:
+        article_list_data = []
+        tag_id = models.Tag.objects.get(tag=tag_data)
+        articles = models.Article.objects.filter(article_tag=tag_id).order_by('id')
+        for article in articles:
+            article_info = {
+                'article_id': article.id,
+                'article_title': article.title,
+                'article_desc': article.desc,
+                'article_time': article.create_time.strftime('%Y-%m-%d %H:%I:%S'),
+                'author': article.article_user.username,
+            }
+            article_list_data.append(article_info)
+        return Response(article_list_data)
+    else:
+        article_list_data = []
+        articles = models.Article.objects.all().order_by('id')
+        for article in articles:
+            article_info = {
+                'article_id': article.id,
+                'article_title': article.title,
+                'article_desc': article.desc,
+                'article_time': article.create_time.strftime('%Y-%m-%d %H:%I:%S'),
+                'author': article.article_user.username,
+            }
+            article_list_data.append(article_info)
+        return Response(article_list_data)
 
 
 # 分类
@@ -183,8 +220,8 @@ def article_list(request):
 def category(request):
     if request.method == 'GET':
         category_data = []
-        categorys = models.Category.objects.all()
-        for i in categorys:
+        category_all = models.Category.objects.all()
+        for i in category_all:
             category_info = {
                 'value': i.category,
                 'label': i.category,
@@ -213,4 +250,42 @@ def tag(request):
     if request.method == 'POST':
         new_tag = request.POST.get('new_tag')
         models.Tag(tag=new_tag).save()
+    return Response('ok')
+
+
+# 点赞
+@api_view(['GET', 'POST'])
+def like(request):
+    token = request.POST.get('token')
+    article_id = request.POST.get('article_id')
+    state = json.loads(request.POST.get("state"))
+    user = Token.objects.get(key=token).user
+    article = models.Article.objects.get(id=article_id)
+    likes = models.Likes(user=user, article=article, state=state)
+    likes.save()
+    return Response('ok')
+
+
+# 收藏
+@api_view(['GET', 'POST'])
+def collection(request):
+    return Response('ok')
+
+
+# 评论
+@api_view(['GET', 'POST'])
+def comment(request):
+    return Response('ok')
+
+
+# 用户对文章点赞评论收藏的记录
+@api_view(['POST'])
+def operating_status(request):
+    token = request.POST.get('token')
+    user = Token.objects.get(key=token).user
+    articles = models.Article.objects.all()
+    for article in articles:
+        state = {
+            'likes': article.article_user
+        }
     return Response('ok')

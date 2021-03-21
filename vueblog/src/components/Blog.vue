@@ -8,7 +8,7 @@
               <span>分类</span>
             </div>
             <div v-for="(category, index) in category_list" :key="index" class="text item">
-              <el-button class="blog__category_btn">{{ category }}</el-button>
+              <el-button class="blog__category_btn" @click="getCategoryArticle(category)">{{ category }}</el-button>
             </div>
           </el-card>
           <el-card class="box-card tag" shadow="never">
@@ -16,7 +16,7 @@
               <span>标签</span>
             </div>
             <div v-for="(tag, index) in tag_list" :key="index">
-              <el-button round class="blog__tag_btn">{{ tag }}</el-button>
+              <el-button round class="blog__tag_btn" @click="getTagArticle(tag)">{{ tag }}</el-button>
             </div>
           </el-card>
           <el-card class="box-card time" shadow="never">
@@ -65,19 +65,16 @@ export default {
   data() {
     return {
       // articleList:'',
-      category_list: [
-        '前端', '后端', 'Python', 'Java'
-      ],
-      tag_list: [
-        '数据库', 'Vue', 'Django', '网络协议',
-      ],
+      category_list: [],
+      tag_list: [],
       time_list:[
           '2021-3', '2021-2', '2021-1'
       ]
     }
   },
   created() {
-    this.getCategoryAndTag()
+    this.getTag()
+    this.getCategory()
   },
   components:{
   },
@@ -86,10 +83,36 @@ export default {
       axios({
         url:'http://127.0.0.1:9999/api/article-list/',
         method:'get',
-      }).then((res) => {
-        console.log(res.data)
+      }).then(() => {
+        // console.log(res.data)
 
       })
+    },
+    getCategory(){
+      axios({
+        url:'http://127.0.0.1:9999/api/category/',
+        method:'get',
+      }).then((res) => {
+        res.data.forEach((value) => {
+          this.category_list.push(value.value)
+        })
+      })
+    },
+    getCategoryArticle(category) {
+        this.$router.push({name:'ArticleList', query:{category: category}})
+    },
+    getTag(){
+      axios({
+        url:'http://127.0.0.1:9999/api/tag/',
+        method:'get',
+      }).then((res) => {
+        res.data.forEach((value) => {
+          this.tag_list.push(value.value)
+        })
+      })
+    },
+    getTagArticle(tag){
+        this.$router.push({name:'ArticleList', query:{tag:tag}})
     },
     toArticleList(){
       this.$router.push({name:'ArticleList'})

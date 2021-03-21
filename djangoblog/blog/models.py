@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from datetime import datetime
 # Create your models here.
 
 
@@ -46,3 +45,41 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.tag
+
+
+# 评论
+class Comments(models.Model):
+    text = models.TextField(verbose_name='评论内容', max_length=128, blank=True, null=True)
+    user = models.ForeignKey('User', on_delete=models.CASCADE, blank=True, null=True,
+                             verbose_name='评论者', related_name='user_comments')
+    article = models.ForeignKey('Article', on_delete=models.CASCADE, blank=True, null=True,
+                                verbose_name='评论的文章', related_name='article_comments')
+    reply = models.ForeignKey('Comments', on_delete=models.SET_NULL, blank=True, null=True,
+                              verbose_name='回复', related_name='comments_reply')
+
+    def __str__(self):
+        return self.text
+
+
+# 收藏
+class Collection(models.Model):
+    state = models.BooleanField(default=False, blank=True, null=True, verbose_name='收藏状态')
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, blank=True, null=True,
+                             verbose_name='收藏者', related_name="collection_user")
+    article = models.ForeignKey(to=Article, on_delete=models.CASCADE, blank=True, null=True,
+                                verbose_name='收藏的文章', related_name='collection_article')
+
+    def __int__(self):
+        return self.id
+
+
+# 点赞
+class Likes(models.Model):
+    state = models.BooleanField(default=False, blank=True, null=True, verbose_name='点赞状态')
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, blank=True, null=True,
+                             verbose_name='点赞者', related_name='likes_user')
+    article = models.ForeignKey(to=Article, on_delete=models.CASCADE, blank=True, null=True,
+                                verbose_name='点赞的文章', related_name='likes_article')
+
+    def __int__(self):
+        return self.id
