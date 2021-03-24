@@ -32,5 +32,4 @@ urlpatterns = [
     path('like/', views.like),      # 点赞
     path('collection/', views.collection),   # 收藏
     path('comment/', views.comment),  # 评论
-    path('operatingstatus/', views.operating_status)  # 用户对文章点赞评论收藏的记录
 ]

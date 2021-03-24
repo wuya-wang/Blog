@@ -7,9 +7,17 @@
         <div>
           <p class="card-text text-black-50" style="float: left">{{ article.article_time }}</p>
           <div style="float: right">
-            <i  class="iconfont icon-dianzan" @click="toLikes(article.article_id)"></i>
-            <i class="iconfont icon-shoucang" @click="toCollections(article.article_id)"></i>
-            <i  class="iconfont icon-dashang" @click="toComments(article.article_id)"></i>
+            <i v-if="article.likes" class="iconfont icon-dianzan" @click="toLikes(article.article_id, article.likes)" style="color: #2496e2"></i>
+            <i v-else class="iconfont icon-dianzan" @click="toLikes(article.article_id)"></i>
+            <span class="text-black-50">{{ article.all_likes }}</span>
+
+            <i v-if="article.collections" class="iconfont icon-shoucang" @click="toCollections(article.article_id, article.collections)" style="color: #ee0d5e"></i>
+            <i v-else class="iconfont icon-shoucang" @click="toCollections(article.article_id)"></i>
+            <span class="text-black-50">{{ article.all_collections }}</span>
+
+            <i v-if="article.comments"  class="iconfont icon-liuyanpinglun" @click="toComments(article.article_id, article.comments)" style="color: #ffbb03"></i>
+            <i v-else class="iconfont icon-liuyanpinglun" @click="toComments(article.article_id)"></i>
+            <span class="text-black-50">{{ article.all_comments }}</span>
           </div>
         </div>
 
@@ -21,25 +29,18 @@
 <script>
 import axios from "axios";
 import Qs from "qs";
-
+// import Vue from "vue"
 export default {
   name: "ArticleList",
   data(){
     return {
-      article_list: '',
+      article_list: [],
       category: this.$route.query.category,
       tag: this.$route.query.tag,
-      // 点赞收藏评论状态
-      state: {
-        like: false,
-        collection: false,
-        reward: false
-      },
     }
   },
   created() {
     this.getArticleList()
-    this.operatingStatus()
   },
   watch: {
     // 监听路由变化
@@ -53,12 +54,14 @@ export default {
     getArticleList() {
       axios({
         url: 'http://127.0.0.1:9999/api/article-list/',
-        method: 'get',
-        params:{
-          'category':this.category,
-          'tag': this.tag,
-        }
+        method: 'post',
+        data:Qs.stringify({
+          category:this.category,
+          tag: this.tag,
+          token: this.$store.getters.userLoginStatus,
+        })
       }).then((res) => {
+        // console.log(res.data)
         this.article_list = res.data
       })
     },
@@ -66,33 +69,49 @@ export default {
       // console.log(id)
       this.$router.push({name:'Article',query:{'id':id}})
     },
-    // 用户对文章的点收评状态
-    operatingStatus(){
-      axios({
-        url:'http://127.0.0.1:9999/api/operatingstatus/',
-        method:'post',
-        data:Qs.stringify({
-          token: this.$store.getters.userLoginStatus,
-        })
-      }).then((res) => {
-        console.log(res.data)
-      })
-    },
-    toLikes(id){
+    toLikes(id, state){
       axios({
         url:'http://127.0.0.1:9999/api/like/',
         method:'post',
         data:Qs.stringify({
           article_id: id,
           token: this.$store.getters.userLoginStatus,
-          state: !this.state.like,
+          state: !state,
         })
-      }).then((res) => {
-        console.log(res.data)
+      }).then(() => {
+        this.getArticleList()
+        // Vue.set(this.article_list, index, {likes:!state})
       })
     },
-    toCollections(){},
-    toComments(){},
+    toCollections(id, state){
+      axios({
+        url:'http://127.0.0.1:9999/api/collection/',
+        method:'post',
+        data:Qs.stringify({
+          article_id: id,
+          token: this.$store.getters.userLoginStatus,
+          state: !state,
+        })
+      }).then(() => {
+        this.getArticleList()
+        // Vue.set(this.article_list, index, {likes:!state})
+      })
+    },
+    // toComments(id, state){
+    //   if (state !== 0){state = 0}else {state = 1}
+    //   axios({
+    //     url:'http://127.0.0.1:9999/api/comment/',
+    //     method:'post',
+    //     data:Qs.stringify({
+    //       article_id: id,
+    //       token: this.$store.getters.userLoginStatus,
+    //       state: state,
+    //     })
+    //   }).then(() => {
+    //     this.getArticleList()
+    //     // Vue.set(this.article_list, index, {likes:!state})
+    //   })
+    // },
   },
 }
 </script>
@@ -114,5 +133,6 @@ export default {
 }
 .iconfont{
   font-size: 1.3rem;
+  margin: 0 .1rem 0 .5rem;
 }
 </style>

@@ -30,29 +30,59 @@
           <el-button class="blog__all_article_btn" round @click=" toArticleList()">全部文章</el-button>
         </div>
       </el-col>
+
       <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl='12' style="margin-top: 10px">
-          <router-view v-wechat-title="$route.meta.title"></router-view>
+          <router-view v-wechat-title="$route.meta.title" :ArticleData="article_data"></router-view>
       </el-col>
-      <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6" style="margin-top: 10px">
-        <div style="background-color: #999897;height: 500px">
+
+      <el-col v-if="show" :xs="24" :sm="24" :md="6" :lg="6" :xl="6" style="margin-top: 10px">
+        <div class="card">
           <el-row class="article-icon">
             <el-col :span="8">
-              <i  class="iconfont icon-dianzan" style="color: #2496e2"></i>
-<!--              <i  class="iconfont icon-dianzan"></i>-->
+              <i v-if="article_data.likes" class="iconfont icon-dianzan" style="color: #2496e2" @click="toLikes(article_data.likes)"></i>
+              <i v-else class="iconfont icon-dianzan" @click="toLikes(article_data.likes)"></i>
               <span  style="margin-left: 5px"></span>
             </el-col>
             <el-col :span="8">
-              <i  class="iconfont icon-shoucang" style="color: red;"></i>
-<!--              <i class="iconfont icon-shoucang"></i>-->
+              <i v-if="article_data.collections"  class="iconfont icon-shoucang" style="color: red;" @click="toCollections(article_data.collections)"></i>
+              <i v-else class="iconfont icon-shoucang"  @click="toCollections(article_data.collections)"></i>
               <span  style="margin-left: 5px"></span>
             </el-col>
             <el-col :span="8">
-              <i  class="iconfont icon-dashang" style="color: #efb738"></i>
-<!--              <i  class="iconfont icon-dashang"></i>-->
-              <div><a id="link" target="_blank"></a></div>
+              <i v-if="article_data.comments"  class="iconfont icon-liuyanpinglun" style="color: #efb738"></i>
+              <i v-else  class="iconfont icon-liuyanpinglun"></i>
             </el-col>
           </el-row>
+          <div class="comment" style="padding: 0 .5rem .5rem .5rem">
+            <div v-for="(comments, index) in article_data.comments_data" :key="index">
+              <div class="clearfix">
+                <span v-text="comments.user"></span>
+                <p v-text="comments.text"></p>
+                <p class="reply">回复</p>
+              </div>
+              <el-divider></el-divider>
+            </div>
+            <el-input
+                type="textarea"
+                :rows="2"
+                placeholder="请输入内容"
+                v-model="textarea">
+            </el-input>
+            <el-button style="width: 100%; margin-top: .5rem" round @click="makeComment()">发表</el-button>
+          </div>
         </div>
+      </el-col>
+
+      <el-col v-else :xs="24" :sm="24" :md="6" :lg="6" :xl="6" style="margin-top: 10px">
+          <el-carousel height=700px>
+            <el-carousel-item v-for="(img, index) in img_list" :key="index">
+              <el-image
+                  style="height: 700px; width: 100%"
+                  :src="img"
+                  :fit="'cover'">
+              </el-image>
+            </el-carousel-item>
+          </el-carousel>
       </el-col>
     </el-row>
  </div>
@@ -60,32 +90,111 @@
 
 <script>
 import axios from "axios";
+import Qs from "qs";
 export default {
   name: "Blog",
   data() {
     return {
-      // articleList:'',
+      show:0,
       category_list: [],
       tag_list: [],
+      img_list:[
+          'http://127.0.0.1:9999/media/img/1616058747906-05_2009_11.jpg',
+          'http://127.0.0.1:9999/media/img/1616060212342-005.jpg',
+      ],
       time_list:[
           '2021-3', '2021-2', '2021-1'
-      ]
+      ],
+      article_data:'',
+      textarea:''
     }
   },
   created() {
     this.getTag()
     this.getCategory()
+    this.Renovate()
+  },
+  mounted() {
   },
   components:{
   },
+  watch:{
+    $route(){
+      if (this.$route.query.id){
+        this.show = 1
+        // console.log(this.$route.query.id)
+        this.getArticle(this.$route.query.id)
+      } else {
+        this.show = 0
+      }
+    },
+  },
   methods: {
-    getCategoryAndTag(){
+    makeComment(){
       axios({
-        url:'http://127.0.0.1:9999/api/article-list/',
-        method:'get',
+        url: 'http://127.0.0.1:9999/api/comment/',
+        method: 'post',
+        data:Qs.stringify({
+          token: this.$store.getters.userLoginStatus,
+          article_id:this.$route.query.id,
+          comment:this.textarea,
+        })
+      }).then((res) => {
+        if (res.data === 'ok'){
+          this.$message({
+            showClose: true,
+            message: '发表成功',
+            type: 'success',
+            center: true,
+          });
+          this.textarea = ''
+          this.getArticle()
+        }
+      })
+    },
+    Renovate(){
+      if (this.$route.query.id){
+        this.show = 1
+        this.getArticle()
+      }
+    },
+    getArticle(){
+      axios({
+        url: 'http://127.0.0.1:9999/api/article/',
+        method: 'post',
+        data:Qs.stringify({
+          token: this.$store.getters.userLoginStatus,
+          id:this.$route.query.id,
+        })
+      }).then((res) => {
+        console.log(res.data)
+        this.article_data = res.data
+      })
+    },
+    toLikes(state){
+      axios({
+        url:'http://127.0.0.1:9999/api/like/',
+        method:'post',
+        data:Qs.stringify({
+          article_id: this.$route.query.id,
+          token: this.$store.getters.userLoginStatus,
+          state: !state,
+        })
       }).then(() => {
-        // console.log(res.data)
-
+        this.getArticle()
+      })
+    },
+    toCollections(state){
+      axios({
+        url:'http://127.0.0.1:9999/api/collection/',
+        method:'post',
+        data:Qs.stringify({
+          article_id: this.$route.query.id,
+          token: this.$store.getters.userLoginStatus,
+          state: !state,
+        })
+      }).then(() => {
+        this.getArticle()
       })
     },
     getCategory(){
@@ -99,7 +208,7 @@ export default {
       })
     },
     getCategoryArticle(category) {
-        this.$router.push({name:'ArticleList', query:{category: category}})
+      this.$router.push({name:'ArticleList', query:{category: category}})
     },
     getTag(){
       axios({
@@ -117,7 +226,6 @@ export default {
     toArticleList(){
       this.$router.push({name:'ArticleList'})
     }
-
   },
 }
 </script>
@@ -153,5 +261,25 @@ export default {
 #blog >>> .time .el-card__body div{
   display: inline-block;
   margin: 3px;
+}
+#blog >>> .el-divider--horizontal{
+  margin: .5rem 0;
+}
+.iconfont{
+  font-size: 1.5rem;
+}
+.comment p{
+  line-height: 25px;
+}
+.reply{
+  float: right;
+  padding: 0 .3rem;
+  font-size: .8rem;
+  color: darkgray;
+}
+.reply:hover{
+  color: #2496e2;
+  background-color: #c7c7c7;
+  border-radius: .4rem;
 }
 </style>

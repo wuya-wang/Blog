@@ -37,7 +37,7 @@ const routes = [
                 meta: {
                     title: "博客"
                 },
-                redirect: '/article',
+                redirect: '/article-list',
                 children:[
                     {
                         path: '/article-list',
@@ -98,11 +98,12 @@ const routes = [
 ]
 
 const router = new VueRouter({
-  routes,
+    routes,
+    mode: 'history',
 })
 
 export default router
 const originalPush = VueRouter.prototype.push
 VueRouter.prototype.push = function push(location) {
-  return originalPush.call(this, location).catch(err => err)
+    return originalPush.call(this, location).catch(err => err)
 }
