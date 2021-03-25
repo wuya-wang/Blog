@@ -7,6 +7,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from blog import models
+from djangoblog import fun
 
 
 # 用户名邮箱验证
@@ -151,15 +152,8 @@ def article_data(request):
     # print(token,article_id)
     user = Token.objects.get(key=token).user
     article = models.Article.objects.get(id=article_id)
-    comments_list = models.Comments.objects.filter(article=article)
-    comments_info = []
-    for comments in comments_list:
-        comments_data = {
-            'user': comments.user.username,
-            'text': comments.text,
-            'father': comments.reply,
-        }
-        comments_info.append(comments_data)
+    comments_list = models.Comments.objects.filter(article=article, reply=None)
+    comments_info = fun.get_article_info(comments_list)
     article_info = {
         'article_title': article.title,
         'article_text': article.text,
@@ -180,62 +174,19 @@ def article_list(request):
     tag_data = request.POST.get('tag')
     token = request.POST.get('token')
     user = Token.objects.get(key=token).user
-    article_list_data = []
     if category_data is not None:
         category_id = models.Category.objects.get(category=category_data)
         articles = models.Article.objects.filter(article_category=category_id).order_by('id')
-        for article in articles:
-            article_info = {
-                'article_id': article.id,
-                'article_title': article.title,
-                'article_desc': article.desc,
-                'article_time': article.create_time.strftime('%Y-%m-%d %H:%I:%S'),
-                'author': article.article_user.username,
-                'all_likes': models.Likes.objects.filter(article=article, state=1).count(),
-                'all_collections': models.Collection.objects.filter(article=article, state=1).count(),
-                'all_comments': models.Comments.objects.filter(article=article).count(),
-                'likes': models.Likes.objects.filter(article=article, state=1, user=user).count(),
-                'collections': models.Collection.objects.filter(article=article, state=1, user=user).count(),
-                'comments': models.Comments.objects.filter(article=article, user=user).count(),
-            }
-            article_list_data.append(article_info)
+        article_list_data = fun.article_list(articles, user)
         return Response(article_list_data)
     if tag_data is not None:
         tag_id = models.Tag.objects.get(tag=tag_data)
         articles = models.Article.objects.filter(article_tag=tag_id).order_by('id')
-        for article in articles:
-            article_info = {
-                'article_id': article.id,
-                'article_title': article.title,
-                'article_desc': article.desc,
-                'article_time': article.create_time.strftime('%Y-%m-%d %H:%I:%S'),
-                'author': article.article_user.username,
-                'all_likes': models.Likes.objects.filter(article=article, state=1).count(),
-                'all_collections': models.Collection.objects.filter(article=article, state=1).count(),
-                'all_comments': models.Comments.objects.filter(article=article).count(),
-                'likes': models.Likes.objects.filter(article=article, state=1, user=user).count(),
-                'collections': models.Collection.objects.filter(article=article, state=1, user=user).count(),
-                'comments': models.Comments.objects.filter(article=article, user=user).count(),
-            }
-            article_list_data.append(article_info)
+        article_list_data = fun.article_list(articles, user)
         return Response(article_list_data)
     else:
         articles = models.Article.objects.all().order_by('id')
-        for article in articles:
-            article_info = {
-                'article_id': article.id,
-                'article_title': article.title,
-                'article_desc': article.desc,
-                'article_time': article.create_time.strftime('%Y-%m-%d %H:%I:%S'),
-                'author': article.article_user.username,
-                'all_likes': models.Likes.objects.filter(article=article, state=1).count(),
-                'all_collections': models.Collection.objects.filter(article=article, state=1).count(),
-                'all_comments': models.Comments.objects.filter(article=article).count(),
-                'likes': models.Likes.objects.filter(article=article, state=1, user=user).count(),
-                'collections': models.Collection.objects.filter(article=article, state=1, user=user).count(),
-                'comments': models.Comments.objects.filter(article=article, user=user).count(),
-            }
-            article_list_data.append(article_info)
+        article_list_data = fun.article_list(articles, user)
         return Response(article_list_data)
 
 
@@ -317,9 +268,16 @@ def comment(request):
     token = request.POST.get('token')
     article_id = request.POST.get('article_id')
     comment_data = request.POST.get('comment')
+    comment_id = request.POST.get('comment_id')
     user = Token.objects.get(key=token).user
     article = models.Article.objects.get(id=article_id)
     print(token, article_id, comment_data)
-    new_comment = models.Comments(article=article, user=user, text=comment_data)
-    new_comment.save()
-    return Response('ok')
+    if comment_id:
+        comments = models.Comments.objects.get(id=comment_id)
+        new_comment = models.Comments(article=article, user=user, text=comment_data, reply=comments)
+        new_comment.save()
+        return Response('ok')
+    else:
+        new_comment = models.Comments(article=article, user=user, text=comment_data)
+        new_comment.save()
+        return Response('ok')

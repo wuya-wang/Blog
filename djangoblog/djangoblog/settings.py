@@ -84,10 +84,19 @@ WSGI_APPLICATION = 'djangoblog.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'djangoblog',   # 数据库名
+        'HOST': 'rm-bp1nm17wy54574zra1o.mysql.rds.aliyuncs.com',    # 数据库服务地址
+        'USER': 'wuya',    # 用户名
+        'PASSWORD': 'Whr980723',   # 密码     'POST': 3306   # 端口
     }
 }
 

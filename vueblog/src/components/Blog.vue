@@ -19,7 +19,7 @@
               <el-button round class="blog__tag_btn" @click="getTagArticle(tag)">{{ tag }}</el-button>
             </div>
           </el-card>
-          <el-card class="box-card time" shadow="never">
+          <el-card class="box-card time" shadow="never" v-show="0">
             <div slot="header" class="clearfix">
               <span>时间</span>
             </div>
@@ -58,14 +58,25 @@
               <div class="clearfix">
                 <span v-text="comments.user"></span>
                 <p v-text="comments.text"></p>
-                <p class="reply">回复</p>
+                <p class="reply" @click="replyComments(comments.id, comments.user)">回复</p>
+              </div>
+              <div v-for="(comments_child, children_index) in comments.children" :key="children_index">
+                <p>{{ comments_child.user }} 回复@ {{ comments_child.father }}:</p>
+                <span style="margin-left: 2rem">{{ comments_child.text }}</span>
+                <span class="reply" style="padding-top: 3px" @click="replyComments(comments_child.id, comments_child.user)">回复</span>
+                <div v-for="(comments_child_children, children_children_index) in comments_child.children" :key="children_children_index">
+                  <p>{{ comments_child_children.user }} 回复@ {{ comments_child_children.father }}:</p>
+                  <span style="margin-left: 2rem">{{ comments_child_children.text }}</span>
+                  <span class="reply" style="padding-top: 3px" @click="replyComments(comments_child_children.id, comments_child_children.user)">回复</span>
+                </div>
               </div>
               <el-divider></el-divider>
             </div>
             <el-input
+                ref="inputName"
                 type="textarea"
                 :rows="2"
-                placeholder="请输入内容"
+                :placeholder=this.placeholder
                 v-model="textarea">
             </el-input>
             <el-button style="width: 100%; margin-top: .5rem" round @click="makeComment()">发表</el-button>
@@ -106,7 +117,9 @@ export default {
           '2021-3', '2021-2', '2021-1'
       ],
       article_data:'',
-      textarea:''
+      textarea:'',
+      reply_comment_id:'',
+      placeholder:'请输入内容'
     }
   },
   created() {
@@ -130,28 +143,6 @@ export default {
     },
   },
   methods: {
-    makeComment(){
-      axios({
-        url: 'http://127.0.0.1:9999/api/comment/',
-        method: 'post',
-        data:Qs.stringify({
-          token: this.$store.getters.userLoginStatus,
-          article_id:this.$route.query.id,
-          comment:this.textarea,
-        })
-      }).then((res) => {
-        if (res.data === 'ok'){
-          this.$message({
-            showClose: true,
-            message: '发表成功',
-            type: 'success',
-            center: true,
-          });
-          this.textarea = ''
-          this.getArticle()
-        }
-      })
-    },
     Renovate(){
       if (this.$route.query.id){
         this.show = 1
@@ -167,7 +158,7 @@ export default {
           id:this.$route.query.id,
         })
       }).then((res) => {
-        console.log(res.data)
+        // console.log(res.data)
         this.article_data = res.data
       })
     },
@@ -196,6 +187,36 @@ export default {
       }).then(() => {
         this.getArticle()
       })
+    },
+    makeComment(){
+        axios({
+        url: 'http://127.0.0.1:9999/api/comment/',
+        method: 'post',
+        data:Qs.stringify({
+          token: this.$store.getters.userLoginStatus,
+          article_id:this.$route.query.id,
+          comment:this.textarea,
+          comment_id: this.reply_comment_id
+        })
+      }).then((res) => {
+        if (res.data === 'ok'){
+          this.$message({
+            showClose: true,
+            message: '发表成功',
+            type: 'success',
+            center: true,
+          });
+          this.textarea = ''
+          this.placeholder = ''
+          this.reply_comment_id = ''
+          this.getArticle()
+        }
+      })
+    },
+    replyComments(id, user){
+      this.reply_comment_id = id
+      this.placeholder ='回复：' + user
+      this.$refs.inputName.focus()
     },
     getCategory(){
       axios({
@@ -281,5 +302,6 @@ export default {
   color: #2496e2;
   background-color: #c7c7c7;
   border-radius: .4rem;
+  cursor: pointer;
 }
 </style>

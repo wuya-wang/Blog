@@ -39,7 +39,7 @@ class Category(models.Model):
 class Tag(models.Model):
     tag = models.CharField(max_length=32, verbose_name='标签')
     article_tag = models.ManyToManyField(
-        "Article", blank=True, null=True,
+        "Article", blank=True,
         related_name='article_tag'
     )
 

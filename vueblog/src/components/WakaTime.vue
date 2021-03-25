@@ -1,5 +1,8 @@
 <template>
   <div id="wakatime">
+    <div>
+
+
     <el-row type="flex" class="row-bg" justify="space-around" style="margin-bottom: 20px">
       <el-col :xs="24" :sm="24" :md="10" :lg="10" :xl="8">
         <figure><embed src="https://wakatime.com/share/@8e33fc72-2aa9-478d-a8c0-e4e97b54f6f9/8a935e96-44a7-44bb-9aab-d1576199f8cc.svg"></figure>
@@ -16,6 +19,7 @@
         <figure><embed src="https://wakatime.com/share/@8e33fc72-2aa9-478d-a8c0-e4e97b54f6f9/773ba8e9-e101-45d1-b6d5-f24ecd582609.svg"></figure>
       </el-col>
     </el-row>
+    </div>
   </div>
 </template>
 

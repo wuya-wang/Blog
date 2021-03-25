@@ -183,6 +183,15 @@ name: "AddArticle",
         });
         return
       }
+      if (this.$store.state.userinfo.username !== 'wuya'){
+        this.$message({
+          showClose: true,
+          message: '无权限',
+          type: 'warning',
+          center: true,
+        });
+        return
+      }
       axios({
         url: 'http://127.0.0.1:9999/api/add-article/',
         method: 'post',
@@ -303,7 +312,7 @@ name: "AddArticle",
 
 <style scoped>
 #add-article >>> .markdown-body{
-  min-height: calc(100vh - 56px) ;
+  min-height: calc(100vh - 112px) ;
 }
 #add-article >>> .markdown-body img {
     max-width: 50%;

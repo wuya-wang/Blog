@@ -31,6 +31,46 @@ const routes = [
                 },
             },
             {
+                path:'/user',
+                name:'User',
+                component:() => import('../components/User'),
+                meta: {
+                    title: "用户中心"
+                },
+            },
+            {
+                path:'/visualization',
+                name:'Visualization',
+                component:() => import('../components/Visualization'),
+                meta: {
+                    title: "可视化"
+                },
+            },
+            {
+                path:'/data-analysis',
+                name:'DataAnalysis',
+                component:() => import('../components/DataAnalysis'),
+                meta: {
+                    title: "数据分析"
+                },
+            },
+            {
+                path:'/e-commerce',
+                name:'E-Commerce',
+                component:() => import('../components/E-Commerce'),
+                meta: {
+                    title: "电商"
+                },
+            },
+            {
+                path:'/chat',
+                name:'chat',
+                component:() => import('../components/Chat'),
+                meta: {
+                    title: "数据分析"
+                },
+            },
+            {
                 path:'/blog',
                 name:'Blog',
                 component:() => import('../components/Blog'),
@@ -93,6 +133,15 @@ const routes = [
             title: "注册"
         },
     },
+    {
+        path: '/other-world',
+        name: 'OtherWorld',
+        component: () => import('../views/OtherWorld.vue'),
+        meta: {
+            title: "里世界"
+        },
+    },
+
 
 
 ]

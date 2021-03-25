@@ -16,33 +16,33 @@
               <span v-else v-text="username"></span>
             </template>
             <el-menu-item-group v-if="this.$store.getters.userLoginStatus">
-              <el-menu-item index="1-1">个人中心</el-menu-item>
+              <el-menu-item index="/user">个人中心</el-menu-item>
               <el-menu-item @click="logout()">登出</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
           <el-menu-item index='/blog'>
-            <i class="el-icon-menu"></i>
+            <i class="el-icon-notebook-1"></i>
             <span slot="title">个人博客</span>
           </el-menu-item>
           <el-submenu index="3">
             <template slot="title">
-              <i class="el-icon-user"></i>
+              <i class="el-icon-folder-opened"></i>
               <span>Demo</span>
             </template>
             <el-menu-item-group>
-              <el-menu-item index="3-1">个人中心</el-menu-item>
-              <el-menu-item index="3-2">选项2</el-menu-item>
-              <el-menu-item index="3-3">个人中心</el-menu-item>
-              <el-menu-item index="3-4">选项2</el-menu-item>
+              <el-menu-item index="/visualization"><i class="el-icon-data-line"></i>可视化</el-menu-item>
+              <el-menu-item index="/data-analysis"><i class="el-icon-pie-chart"></i>数据分析</el-menu-item>
+              <el-menu-item index="/e-commerce"><i class="el-icon-shopping-bag-1"></i>电商</el-menu-item>
+              <el-menu-item index="/chat"><i class="el-icon-chat-dot-square"></i>在线聊天</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
           <el-menu-item index="/add-article">
-            <i class="el-icon-setting"></i>
+            <i class="el-icon-edit"></i>
             <span slot="title">文章编辑</span>
           </el-menu-item>
-          <el-submenu index="5">
+          <el-submenu index="5" v-if="this.$store.state.userinfo.username === this.superuser">
             <template slot="title">
-              <i class="el-icon-user"></i>
+              <i class="el-icon-c-scale-to-original"></i>
               <span>管理员</span>
             </template>
             <el-menu-item-group>
@@ -52,8 +52,8 @@
               <el-menu-item index="5-4">管理</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
-          <el-menu-item index="6">
-            <i class="el-icon-setting"></i>
+          <el-menu-item index="/other-world">
+            <i class="el-icon-picture-outline"></i>
             <span slot="title">里世界</span>
           </el-menu-item>
         </el-menu>
@@ -63,7 +63,7 @@
           <div>
             <i @click="setAside()" class="el-icon-more-outline" :class="{'mobile-icon':mobileIcon, 'pc-icon':pcIcon, 'el-icon':elIcon}"></i>
           </div>
-          1231564
+          <span>选择比努力更重要</span>
           <div class="home__navbar" v-if="!(this.$store.getters.userLoginStatus)">
             <div class="navbar-register" @click="goRegister()">
               <i class="iconfont icon-zhuce"></i>
@@ -76,8 +76,11 @@
           </div>
         </div>
         <div class="main">
-
           <router-view v-wechat-title="$route.meta.title"></router-view>
+        </div>
+        <div class="footer">
+          <a href="https://beian.miit.gov.cn/#/home"><p>粤ICP备20054363号</p></a>
+          <p>Copyright © 2021 Hosted by 浮生无涯</p>
         </div>
       </div>
     </div>
@@ -88,6 +91,7 @@
 export default {
   data() {
     return {
+      superuser:'wuya',
       username:'游客',
       conceal_main: true,
       userinfo: this.$store.state.userinfo,
@@ -235,23 +239,40 @@ export default {
   width: calc(100% - 250px);
   transition: all .5s;
 }
-
+.header span{
+  display: block;
+  font-size: 1.5rem;
+  margin: 10px 0;
+}
 .main{
   position: relative;
   top: 56px;
+  min-height: 826px;
   margin-bottom: 56px;
   padding: 0 10px;;
   z-index: 900;
   background: rgb(255, 255, 255);
 }
 .footer{
-  position: fixed;
+  position: relative;
   width: 100%;
   bottom: 0;
   padding: 0 10px;
   height: 56px;
   z-index: 1000;
-  background: #f2a8c9;
+  text-align: center;
+}
+.footer p{
+  line-height: 28px;
+  font-weight: 600;
+}
+.footer a{
+  text-decoration: none;
+  color: inherit;
+}
+.footer a:hover{
+  text-decoration: none;
+  color: inherit;
 }
 .el-icon{
   position: absolute;

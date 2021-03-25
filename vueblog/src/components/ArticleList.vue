@@ -15,8 +15,8 @@
             <i v-else class="iconfont icon-shoucang" @click="toCollections(article.article_id)"></i>
             <span class="text-black-50">{{ article.all_collections }}</span>
 
-            <i v-if="article.comments"  class="iconfont icon-liuyanpinglun" @click="toComments(article.article_id, article.comments)" style="color: #ffbb03"></i>
-            <i v-else class="iconfont icon-liuyanpinglun" @click="toComments(article.article_id)"></i>
+            <i v-if="article.comments"  class="iconfont icon-liuyanpinglun" style="color: #ffbb03"></i>
+            <i v-else class="iconfont icon-liuyanpinglun"></i>
             <span class="text-black-50">{{ article.all_comments }}</span>
           </div>
         </div>
@@ -97,21 +97,6 @@ export default {
         // Vue.set(this.article_list, index, {likes:!state})
       })
     },
-    // toComments(id, state){
-    //   if (state !== 0){state = 0}else {state = 1}
-    //   axios({
-    //     url:'http://127.0.0.1:9999/api/comment/',
-    //     method:'post',
-    //     data:Qs.stringify({
-    //       article_id: id,
-    //       token: this.$store.getters.userLoginStatus,
-    //       state: state,
-    //     })
-    //   }).then(() => {
-    //     this.getArticleList()
-    //     // Vue.set(this.article_list, index, {likes:!state})
-    //   })
-    // },
   },
 }
 </script>
@@ -134,5 +119,8 @@ export default {
 .iconfont{
   font-size: 1.3rem;
   margin: 0 .1rem 0 .5rem;
+}
+span{
+
 }
 </style>
