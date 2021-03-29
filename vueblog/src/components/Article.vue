@@ -58,4 +58,10 @@ export default {
   margin: 5px;
   max-width: 400px;
 }
+#article{
+  border: #C0C4CC .1rem solid;
+  border-radius: .2rem;
+  padding: .4rem;
+  background-color: #C0C4CC40;
+}
 </style>

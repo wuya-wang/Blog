@@ -90,13 +90,19 @@ WSGI_APPLICATION = 'djangoblog.wsgi.application'
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'djangoblog',   # 数据库名
+#         'HOST': 'rm-bp1nm17wy54574zra1o.mysql.rds.aliyuncs.com',    # 数据库服务地址
+#         'USER': 'wuya',    # 用户名
+#         'PASSWORD': 'Whr980723',   # 密码     'POST': 3306   # 端口
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'djangoblog',   # 数据库名
-        'HOST': 'rm-bp1nm17wy54574zra1o.mysql.rds.aliyuncs.com',    # 数据库服务地址
-        'USER': 'wuya',    # 用户名
-        'PASSWORD': 'Whr980723',   # 密码     'POST': 3306   # 端口
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
@@ -158,6 +164,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",
     "http://127.0.0.1:9000",
     "http://127.0.0.1:9999",
+    "https://www.linklike.top",
+    "http://www.linklike.top",
 ]
 
 # 允许使用的HTTP请求方法列表

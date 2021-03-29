@@ -70,6 +70,7 @@ export default {
       this.$router.push({name:'Article',query:{'id':id}})
     },
     toLikes(id, state){
+      if (this.$store.getters.userLoginStatus){
       axios({
         url:'http://127.0.0.1:9999/api/like/',
         method:'post',
@@ -82,9 +83,18 @@ export default {
         this.getArticleList()
         // Vue.set(this.article_list, index, {likes:!state})
       })
+      }else{
+        this.$message({
+          showClose: true,
+          message: '请先登录',
+          type: 'error',
+          center: true,
+        })
+      }
     },
     toCollections(id, state){
-      axios({
+      if (this.$store.getters.userLoginStatus){
+        axios({
         url:'http://127.0.0.1:9999/api/collection/',
         method:'post',
         data:Qs.stringify({
@@ -96,6 +106,14 @@ export default {
         this.getArticleList()
         // Vue.set(this.article_list, index, {likes:!state})
       })
+      } else {
+        this.$message({
+          showClose: true,
+          message: '请先登录',
+          type: 'error',
+          center: true,
+        })
+      }
     },
   },
 }

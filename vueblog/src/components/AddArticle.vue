@@ -1,6 +1,6 @@
 <template>
   <div id="add-article">
-    <el-row :gutter="10">
+    <el-row :gutter=10 style="margin: 0">
       <el-col :xs="24" :sm="24" :md="24" :lg="5" :xl="5">
         <div class="add-article__input">
           <div>
@@ -45,7 +45,7 @@
           <el-divider></el-divider>
           <div>
             <div class="add-article__header">标签</div>
-            <el-select v-model='tag_value' placeholder="请选择">
+            <el-select v-model='tag_value' multiple placeholder="请选择">
               <el-option
                   v-for="item in tag"
                   :key="item.value"
@@ -201,7 +201,7 @@ name: "AddArticle",
           article_title: this.article.title,
           article_introduce: this.article.introduce,
           article_category: this.category_value,
-          article_tag: this.tag_value,
+          article_tag: JSON.stringify(this.tag_value),
         })
       }).then((res) => {
         if (res.data === 'OK'){

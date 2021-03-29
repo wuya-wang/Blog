@@ -1,46 +1,50 @@
 <template>
   <div id="home">
-    <div class="wrapper">
-      <div :class="{'aside':Aside ,'min-side':minAside,}">
-        <div class="block">
-          <el-avatar :size="56" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
-        </div>
-        <el-menu
-            default-active="2"
-            class="el-menu-vertical-demo"
-            :router=true>
-          <el-submenu index="1">
-            <template slot="title">
-              <i class="el-icon-user" ></i>
-              <span v-if="userinfo.username" v-text="userinfo.username "></span>
-              <span v-else v-text="username"></span>
-            </template>
-            <el-menu-item-group v-if="this.$store.getters.userLoginStatus">
-              <el-menu-item index="/user">个人中心</el-menu-item>
-              <el-menu-item @click="logout()">登出</el-menu-item>
-            </el-menu-item-group>
-          </el-submenu>
-          <el-menu-item index='/blog'>
-            <i class="el-icon-notebook-1"></i>
-            <span slot="title">个人博客</span>
-          </el-menu-item>
-          <el-submenu index="3">
-            <template slot="title">
-              <i class="el-icon-folder-opened"></i>
-              <span>Demo</span>
-            </template>
-            <el-menu-item-group>
-              <el-menu-item index="/visualization"><i class="el-icon-data-line"></i>可视化</el-menu-item>
-              <el-menu-item index="/data-analysis"><i class="el-icon-pie-chart"></i>数据分析</el-menu-item>
-              <el-menu-item index="/e-commerce"><i class="el-icon-shopping-bag-1"></i>电商</el-menu-item>
-              <el-menu-item index="/chat"><i class="el-icon-chat-dot-square"></i>在线聊天</el-menu-item>
-            </el-menu-item-group>
-          </el-submenu>
+    <div v-if="this.screenWidth >= 400" :class="{'max-aside': maxAside, 'min-aside': minAside}">
+      <div class="block">
+        <el-avatar :size="56" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
+      </div>
+      <el-menu
+          default-active="1"
+          class="el-menu-vertical-demo"
+          :router=true>
+        <el-submenu index="1">
+          <template slot="title">
+            <i class="el-icon-user" ></i>
+            <span v-if="userinfo.username" v-text="userinfo.username "></span>
+            <span v-else v-text="username"></span>
+          </template>
+          <el-menu-item-group v-if="this.$store.getters.userLoginStatus">
+            <el-menu-item index="/user">个人中心</el-menu-item>
+            <el-menu-item @click="logout()">登出</el-menu-item>
+          </el-menu-item-group>
+          <el-menu-item-group v-else>
+            <el-menu-item index="/login"><i class="el-icon-s-promotion"></i>登录</el-menu-item>
+            <el-menu-item index="register"><i class="el-icon-s-custom"></i>注册</el-menu-item>
+          </el-menu-item-group>
+        </el-submenu>
+        <el-menu-item index='/blog'>
+          <i class="el-icon-notebook-1"></i>
+          <span slot="title">个人博客</span>
+        </el-menu-item>
+        <el-submenu index="3">
+          <template slot="title">
+            <i class="el-icon-folder-opened"></i>
+            <span>Demo</span>
+          </template>
+          <el-menu-item-group>
+            <el-menu-item index="/visualization"><i class="el-icon-data-line"></i>可视化</el-menu-item>
+            <el-menu-item index="/data-analysis"><i class="el-icon-pie-chart"></i>数据分析</el-menu-item>
+            <el-menu-item index="/e-commerce"><i class="el-icon-shopping-bag-1"></i>电商</el-menu-item>
+            <el-menu-item index="/chat"><i class="el-icon-chat-dot-square"></i>在线聊天</el-menu-item>
+          </el-menu-item-group>
+        </el-submenu>
+        <div v-if="this.$store.state.userinfo.username === this.superuser">
           <el-menu-item index="/add-article">
             <i class="el-icon-edit"></i>
             <span slot="title">文章编辑</span>
           </el-menu-item>
-          <el-submenu index="5" v-if="this.$store.state.userinfo.username === this.superuser">
+          <el-submenu index="5" >
             <template slot="title">
               <i class="el-icon-c-scale-to-original"></i>
               <span>管理员</span>
@@ -52,36 +56,113 @@
               <el-menu-item index="5-4">管理</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
-          <el-menu-item index="/other-world">
-            <i class="el-icon-picture-outline"></i>
-            <span slot="title">里世界</span>
-          </el-menu-item>
-        </el-menu>
+        </div>
+        <el-menu-item index="/other-world">
+          <i class="el-icon-picture-outline"></i>
+          <span slot="title">里世界</span>
+        </el-menu-item>
+      </el-menu>
+    </div>
+    <div v-else>
+      <el-drawer
+          title="我是标题"
+          :size="'70%'"
+          :direction="'ltr'"
+          :visible.sync="drawer"
+          :with-header="false">
+        <div>
+          <div class="block">
+            <el-avatar :size="56" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
+          </div>
+          <el-menu
+              default-active="1"
+              class="el-menu-vertical-demo"
+              :router=true>
+            <el-submenu index="1">
+              <template slot="title">
+                <i class="el-icon-user" ></i>
+                <span v-if="userinfo.username" v-text="userinfo.username "></span>
+                <span v-else v-text="username"></span>
+              </template>
+              <el-menu-item-group v-if="this.$store.getters.userLoginStatus">
+                <el-menu-item @click="drawer = false" index="/user">个人中心</el-menu-item>
+                <el-menu-item  @click="logout(); drawer = false">登出</el-menu-item>
+              </el-menu-item-group>
+              <el-menu-item-group v-else>
+                <el-menu-item @click="drawer = false" index="/login"><i class="el-icon-s-promotion"></i>登录</el-menu-item>
+                <el-menu-item @click="drawer = false" index="register"><i class="el-icon-s-custom"></i>注册</el-menu-item>
+              </el-menu-item-group>
+            </el-submenu>
+            <el-menu-item @click="drawer = false" index='/blog'>
+              <i class="el-icon-notebook-1"></i>
+              <span slot="title">个人博客</span>
+            </el-menu-item>
+            <el-submenu index="3">
+              <template slot="title">
+                <i class="el-icon-folder-opened"></i>
+                <span>Demo</span>
+              </template>
+              <el-menu-item-group>
+                <el-menu-item @click="drawer = false" index="/visualization"><i class="el-icon-data-line"></i>可视化</el-menu-item>
+                <el-menu-item @click="drawer = false" index="/data-analysis"><i class="el-icon-pie-chart"></i>数据分析</el-menu-item>
+                <el-menu-item @click="drawer = false" index="/e-commerce"><i class="el-icon-shopping-bag-1"></i>电商</el-menu-item>
+                <el-menu-item @click="drawer = false" index="/chat"><i class="el-icon-chat-dot-square"></i>在线聊天</el-menu-item>
+              </el-menu-item-group>
+            </el-submenu>
+            <div v-if="this.$store.state.userinfo.username === this.superuser">
+              <el-menu-item @click="drawer = false" index="/add-article">
+                <i class="el-icon-edit"></i>
+                <span slot="title">文章编辑</span>
+              </el-menu-item>
+              <el-submenu index="5" >
+                <template slot="title">
+                  <i class="el-icon-c-scale-to-original"></i>
+                  <span>管理员</span>
+                </template>
+                <el-menu-item-group>
+                  <el-menu-item @click="drawer = false" index="5-1">文章管理</el-menu-item>
+                  <el-menu-item @click="drawer = false" index="5-2">用户管理</el-menu-item>
+                  <el-menu-item @click="drawer = false" index="5-3">管理</el-menu-item>
+                  <el-menu-item @click="drawer = false" index="5-4">管理</el-menu-item>
+                </el-menu-item-group>
+              </el-submenu>
+            </div>
+            <el-menu-item @click="drawer = false" index="/other-world">
+              <i class="el-icon-picture-outline"></i>
+              <span slot="title">里世界</span>
+            </el-menu-item>
+          </el-menu>
+        </div>
+      </el-drawer>
+    </div>
+    <div v-if="this.screenWidth >= 400" :class="{'min-panel':minPanel, 'max-panel':maxPanel}">
+      <div class="header">
+        <div>
+          <i v-if="this.screenWidth >= 400" @click="setAside()" class="el-icon-s-operation pc-icon"></i>
+          <i v-else @click="drawer = true" class="el-icon-s-operation el-icon"></i>
+        </div>
       </div>
-      <div  :class="{'panel':Panel, 'max-panel':maxPanel}">
-        <div class="header" :class="{'max-header':maxHeader}">
-          <div>
-            <i @click="setAside()" class="el-icon-more-outline" :class="{'mobile-icon':mobileIcon, 'pc-icon':pcIcon, 'el-icon':elIcon}"></i>
-          </div>
-          <span>选择比努力更重要</span>
-          <div class="home__navbar" v-if="!(this.$store.getters.userLoginStatus)">
-            <div class="navbar-register" @click="goRegister()">
-              <i class="iconfont icon-zhuce"></i>
-              <p>REGISTER</p>
-            </div>
-            <div class="navbar-login" @click="goLogin()">
-              <i class="iconfont icon-zhiwendenglu"></i>
-              <p>LOGIN</p>
-            </div>
-          </div>
+      <div class="main">
+        <router-view v-wechat-title="$route.meta.title"></router-view>
+      </div>
+      <div class="footer">
+        <a href="https://beian.miit.gov.cn/#/home"><p>粤ICP备20054363号</p></a>
+        <p>Copyright © 2021 Hosted by 浮生无涯</p>
+      </div>
+    </div>
+    <div v-else class="max-panel">
+      <div class="header">
+        <div>
+          <i v-if="this.screenWidth >= 400" @click="setAside()" class="el-icon-s-operation pc-icon"></i>
+          <i v-else @click="drawer = true" class="el-icon-s-operation el-icon"></i>
         </div>
-        <div class="main">
-          <router-view v-wechat-title="$route.meta.title"></router-view>
-        </div>
-        <div class="footer">
-          <a href="https://beian.miit.gov.cn/#/home"><p>粤ICP备20054363号</p></a>
-          <p>Copyright © 2021 Hosted by 浮生无涯</p>
-        </div>
+      </div>
+      <div class="main">
+        <router-view v-wechat-title="$route.meta.title"></router-view>
+      </div>
+      <div class="footer">
+        <a href="https://beian.miit.gov.cn/#/home"><p>粤ICP备20054363号</p></a>
+        <p>Copyright © 2021 Hosted by 浮生无涯</p>
       </div>
     </div>
   </div>
@@ -93,17 +174,13 @@ export default {
     return {
       superuser:'wuya',
       username:'游客',
-      conceal_main: true,
       userinfo: this.$store.state.userinfo,
       screenWidth: document.body.clientWidth,
-      Aside:'',
-      minAside:'',
-      maxPanel:'',
-      Panel:'',
-      maxHeader:'',
-      mobileIcon:'',
-      pcIcon:'',
-      elIcon:'',
+      maxAside:true,
+      minAside:false,
+      maxPanel:false,
+      minPanel:true,
+      drawer: false,
     }
   },
   created() {
@@ -112,7 +189,6 @@ export default {
     };
   },
   mounted() {
-    this.inAside()
   },
   computed: {},
   watch: {
@@ -121,60 +197,14 @@ export default {
     },
   },
   methods: {
-    inAside(){
-      if (this.screenWidth > 400){
-        this.Aside = true
-        this.minAside = false
-        this.maxPanel = false
-        this.Panel = true
-        this.maxHeader=true
-        this.pcIcon = true
-      } else {
-        this.Aside = false
-        this.minAside = true
-        this.maxPanel = true
-        this.Panel = false
-        this.maxHeader=false
-        this.mobileIcon = false
-        this.elIcon = true
-      }
-    },
     setAside(){
-      // 移动端
-      if (this.screenWidth<400){
-        if (this.Aside){
-          this.Aside = false
-          this.minAside = true
-          this.maxPanel = true
-          this.mobileIcon = false
-        } else {
-          this.Aside = true
-          this.minAside = false
-          this.maxPanel = true
-          this.mobileIcon = true
-        }
-      }else {
-        if (this.Aside){
-          this.Aside = false
-          this.minAside = true
-          this.maxPanel = true
-          this.maxHeader = false
-        } else {
-          this.Aside = true
-          this.minAside = false
-          this.maxPanel = false
-          this.maxHeader = true
-        }
-      }
+      this.maxAside = !this.maxAside
+      this.minAside = !this.minAside
+      this.maxPanel = !this.maxPanel
+      this.minPanel = !this.minPanel
     },
     logout(){
       this.$store.dispatch('logout',this.$store.getters.userLoginStatus)
-    },
-    goRegister(){
-      this.$router.push({name:'Register'})
-    },
-    goLogin(){
-      this.$router.push({name:'Login'})
     },
   },
 }
@@ -186,7 +216,7 @@ export default {
   top: 0;
   height: 100vh;
 }
-.aside {
+.max-aside {
   position: fixed;
   top: 0;
   bottom: 0;
@@ -198,20 +228,24 @@ export default {
   background-blend-mode: multiply;
   transition: all .5s;
 }
-.min-side{
+.min-aside {
   position: fixed;
-  left: -300px;
   top: 0;
-  right: 0;
   bottom: 0;
+  left: -250px;
   z-index: 2;
-  width: 300px;
-  background: url("../assets/img/abg.jpg") rgba(0, 0, 0, .7) center ;
+  width: 250px;
+  background: url("../assets/img/abg.jpg") rgba(0, 0, 0, 0.7) center;
   background-size: cover;
   background-blend-mode: multiply;
   transition: all .5s;
 }
-.panel {
+.el-drawer__body{
+  background: url("../assets/img/abg.jpg") rgba(0, 0, 0, .7) center ;
+  background-size: cover;
+  background-blend-mode: multiply;
+}
+.min-panel {
   position: relative;
   float: right;
   width: calc(100% - 250px);
@@ -235,10 +269,6 @@ export default {
   background: #f9d0e2;
   transition: all .5s;
 }
-.max-header{
-  width: calc(100% - 250px);
-  transition: all .5s;
-}
 .header span{
   display: block;
   font-size: 1.5rem;
@@ -249,7 +279,6 @@ export default {
   top: 56px;
   min-height: 826px;
   margin-bottom: 56px;
-  padding: 0 10px;;
   z-index: 900;
   background: rgb(255, 255, 255);
 }
@@ -296,10 +325,7 @@ export default {
   font-weight: 600;
   transition: all .5s;
 }
-.mobile-icon{
-  left: 250px;
-  transition: all .5s;
-}
+
 /*头像*/
 .block{
   margin: 5px;
@@ -309,38 +335,6 @@ export default {
 .el-menu-item.is-active {
     color: #ffffff;
 }
-.home__navbar{
-  position: absolute;
-  display: flex;
-  right: 0;
-  top: 0;
-  padding: 13px 10px;
-  z-index: 10;
-}
-.navbar-register{
-  display: flex;
-  margin: 0 10px;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-}
-.navbar-login{
-  display: flex;
-  margin: 0 10px;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-}
-.navbar-register p,
-.navbar-login p{
-  margin: 0 5px;
-}
-.navbar-register:hover,
-.navbar-login:hover{
-  color: #ba6a71;
-  background-color: #ba6a7140;
-  border-radius: 8px;
-}
 .iconfont{
   font-size: 20px;
   margin: 0 5px;
@@ -348,5 +342,8 @@ export default {
 p{
   margin: 0;
   line-height: 30px;
+}
+.el-menu-item-group__title{
+ padding: 0;
 }
 </style>

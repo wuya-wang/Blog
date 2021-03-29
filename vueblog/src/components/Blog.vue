@@ -1,6 +1,6 @@
 <template>
  <div id="blog">
-    <el-row :gutter="10">
+    <el-row :gutter=10 style="margin: 0">
       <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
         <div class="blog__choose">
           <el-card class="box-card" shadow="never">
@@ -163,55 +163,91 @@ export default {
       })
     },
     toLikes(state){
-      axios({
-        url:'http://127.0.0.1:9999/api/like/',
-        method:'post',
-        data:Qs.stringify({
-          article_id: this.$route.query.id,
-          token: this.$store.getters.userLoginStatus,
-          state: !state,
+      if (this.$store.getters.userLoginStatus){
+        axios({
+          url:'http://127.0.0.1:9999/api/like/',
+          method:'post',
+          data:Qs.stringify({
+            article_id: this.$route.query.id,
+            token: this.$store.getters.userLoginStatus,
+            state: !state,
+          })
+        }).then(() => {
+          this.getArticle()
         })
-      }).then(() => {
-        this.getArticle()
-      })
+      } else {
+        this.$message({
+          showClose: true,
+          message: '请先登录',
+          type: 'error',
+          center: true,
+        })
+      }
     },
     toCollections(state){
-      axios({
-        url:'http://127.0.0.1:9999/api/collection/',
-        method:'post',
-        data:Qs.stringify({
-          article_id: this.$route.query.id,
-          token: this.$store.getters.userLoginStatus,
-          state: !state,
+      if (this.$store.getters.userLoginStatus) {
+        axios({
+          url:'http://127.0.0.1:9999/api/collection/',
+          method:'post',
+          data:Qs.stringify({
+            article_id: this.$route.query.id,
+            token: this.$store.getters.userLoginStatus,
+            state: !state,
+          })
+        }).then(() => {
+          this.getArticle()
         })
-      }).then(() => {
-        this.getArticle()
-      })
+      } else {
+        this.$message({
+          showClose: true,
+          message: '请先登录',
+          type: 'error',
+          center: true,
+        })
+      }
     },
     makeComment(){
-        axios({
+      if (this.textarea){
+        if (this.$store.getters.userLoginStatus) {
+          axios({
         url: 'http://127.0.0.1:9999/api/comment/',
-        method: 'post',
-        data:Qs.stringify({
-          token: this.$store.getters.userLoginStatus,
-          article_id:this.$route.query.id,
-          comment:this.textarea,
-          comment_id: this.reply_comment_id
-        })
-      }).then((res) => {
-        if (res.data === 'ok'){
+            method: 'post',
+            data:Qs.stringify({
+              token: this.$store.getters.userLoginStatus,
+              article_id:this.$route.query.id,
+              comment:this.textarea,
+              comment_id: this.reply_comment_id
+            })
+          }).then((res) => {
+            if (res.data === 'ok'){
+              this.$message({
+                showClose: true,
+                message: '发表成功',
+                type: 'success',
+                center: true,
+              });
+              this.textarea = ''
+              this.placeholder = ''
+              this.reply_comment_id = ''
+              this.getArticle()
+            }
+          })
+        } else {
           this.$message({
             showClose: true,
-            message: '发表成功',
-            type: 'success',
+            message: '请先登录',
+            type: 'error',
             center: true,
-          });
-          this.textarea = ''
-          this.placeholder = ''
-          this.reply_comment_id = ''
-          this.getArticle()
+          })
         }
-      })
+      } else {
+        this.$message({
+          showClose: true,
+          message: '无效输入',
+          type: 'error',
+          center: true,
+        })
+      }
     },
     replyComments(id, user){
       this.reply_comment_id = id

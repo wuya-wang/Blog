@@ -8,6 +8,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from blog import models
 from djangoblog import fun
+from django.views.generic.base import View
 
 
 # 用户名邮箱验证
@@ -66,7 +67,6 @@ def login(request, ):
     username = request.POST.get('username')
     password = request.POST.get('password')
     user = models.User.objects.filter(username=username)
-    print(user)
     if user:
         check_pwd = check_password(password, user[0].password)
         if check_pwd:
@@ -106,7 +106,7 @@ def change_password(request):
 # 添加文章
 @api_view(['POST'])
 def add_article(request):
-    host = 'http://127.0.0.1:9999/'
+    host = 'https://127.0.0.1:9999/'
     img = request.POST.get('img')
     # 上传图片
     if img is not None:
@@ -126,8 +126,8 @@ def add_article(request):
     article_title = request.POST.get('article_title')
     article_desc = request.POST.get('article_introduce')
     article_category = request.POST.get('article_category')
-    article_tag = request.POST.get('article_tag')
-    # print(article_text,article_title,article_desc,article_category,article_tag)
+    article_tag = json.loads(request.POST.get('article_tag'))
+    print(article_tag)
     user_token = Token.objects.get(key=token)
     user = models.User.objects.get(id=user_token.user_id)
     # 存储外键与普通字段
@@ -137,9 +137,10 @@ def add_article(request):
         article_user=user, article_category=article_category_data)
     article_info.save()
     # 获取多对多关系字段
-    article_tag_data = models.Tag.objects.get(tag=article_tag)
-    # 使用add()方法存储多对多关系
-    article_info.article_tag.add(article_tag_data)
+    for tag in article_tag:
+        article_tag_data = models.Tag.objects.get(tag=tag)
+        # 使用add()方法存储多对多关系
+        article_info.article_tag.add(article_tag_data)
     article_info.save()
     return Response('OK')
 
@@ -149,8 +150,7 @@ def add_article(request):
 def article_data(request):
     article_id = request.POST.get("id")
     token = request.POST.get('token')
-    # print(token,article_id)
-    user = Token.objects.get(key=token).user
+    # print(token, article_id)
     article = models.Article.objects.get(id=article_id)
     comments_list = models.Comments.objects.filter(article=article, reply=None)
     comments_info = fun.get_article_info(comments_list)
@@ -159,11 +159,16 @@ def article_data(request):
         'article_text': article.text,
         'article_time': article.create_time.strftime('%Y-%m-%d %H:%I:%S'),
         'author': article.article_user.username,
-        'likes': models.Likes.objects.filter(article=article, state=1, user=user).count(),
-        'collections': models.Collection.objects.filter(article=article, state=1, user=user).count(),
-        'comments': models.Comments.objects.filter(article=article, user=user).count(),
+        'likes': '',
+        'collections': '',
+        'comments': '',
         'comments_data': comments_info
     }
+    if token is not None:
+        user = Token.objects.get(key=token).user
+        article_info['likes'] = models.Likes.objects.filter(article=article, state=1, user=user).count()
+        article_info['collections'] = models.Comments.objects.filter(article=article, user=user).count()
+        article_info['comments'] = models.Comments.objects.filter(article=article, user=user).count()
     return Response(article_info)
 
 
@@ -173,20 +178,20 @@ def article_list(request):
     category_data = request.POST.get('category')
     tag_data = request.POST.get('tag')
     token = request.POST.get('token')
-    user = Token.objects.get(key=token).user
+    userinfo = Token.objects.filter(key=token)
     if category_data is not None:
         category_id = models.Category.objects.get(category=category_data)
         articles = models.Article.objects.filter(article_category=category_id).order_by('id')
-        article_list_data = fun.article_list(articles, user)
+        article_list_data = fun.article_list(articles, userinfo)
         return Response(article_list_data)
     if tag_data is not None:
         tag_id = models.Tag.objects.get(tag=tag_data)
         articles = models.Article.objects.filter(article_tag=tag_id).order_by('id')
-        article_list_data = fun.article_list(articles, user)
+        article_list_data = fun.article_list(articles, userinfo)
         return Response(article_list_data)
     else:
         articles = models.Article.objects.all().order_by('id')
-        article_list_data = fun.article_list(articles, user)
+        article_list_data = fun.article_list(articles, userinfo)
         return Response(article_list_data)
 
 

@@ -1,25 +1,43 @@
 # _*_ coding:utf-8 _*_
+from rest_framework.authtoken.models import Token
+
 from blog import models
 
 
 def article_list(articles, user):
     article_list_data = []
-    for article in articles:
-        article_info = {
-            'article_id': article.id,
-            'article_title': article.title,
-            'article_desc': article.desc,
-            'article_time': article.create_time.strftime('%Y-%m-%d %H:%I:%S'),
-            'author': article.article_user.username,
-            'all_likes': models.Likes.objects.filter(article=article, state=1).count(),
-            'all_collections': models.Collection.objects.filter(article=article, state=1).count(),
-            'all_comments': models.Comments.objects.filter(article=article).count(),
-            'likes': models.Likes.objects.filter(article=article, state=1, user=user).count(),
-            'collections': models.Collection.objects.filter(article=article, state=1, user=user).count(),
-            'comments': models.Comments.objects.filter(article=article, user=user).count(),
-        }
-        article_list_data.append(article_info)
-    return article_list_data
+    if len(user) > 0:
+        user = Token.objects.get(key=user[0]).user
+        for article in articles:
+            article_info = {
+                'article_id': article.id,
+                'article_title': article.title,
+                'article_desc': article.desc,
+                'article_time': article.create_time.strftime('%Y-%m-%d %H:%I:%S'),
+                'author': article.article_user.username,
+                'all_likes': models.Likes.objects.filter(article=article, state=1).count(),
+                'all_collections': models.Collection.objects.filter(article=article, state=1).count(),
+                'all_comments': models.Comments.objects.filter(article=article).count(),
+                'likes': models.Likes.objects.filter(article=article, state=1, user=user).count(),
+                'collections': models.Collection.objects.filter(article=article, state=1, user=user).count(),
+                'comments': models.Comments.objects.filter(article=article, user=user).count(),
+            }
+            article_list_data.append(article_info)
+        return article_list_data
+    else:
+        for article in articles:
+            article_info = {
+                'article_id': article.id,
+                'article_title': article.title,
+                'article_desc': article.desc,
+                'article_time': article.create_time.strftime('%Y-%m-%d %H:%I:%S'),
+                'author': article.article_user.username,
+                'all_likes': models.Likes.objects.filter(article=article, state=1).count(),
+                'all_collections': models.Collection.objects.filter(article=article, state=1).count(),
+                'all_comments': models.Comments.objects.filter(article=article).count(),
+            }
+            article_list_data.append(article_info)
+        return article_list_data
 
 
 def get_article_info(comments_list):
