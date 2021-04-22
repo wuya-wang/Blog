@@ -9,8 +9,7 @@
 </template>
 
 <script>
-import axios from "axios";
-import Qs from "qs";
+// import axios from "axios";
 
 export default {
   name: "Article",
@@ -27,21 +26,22 @@ export default {
   },
   mounted() {
   },
-  prop:['ArticleData'],
   watch: {
-    ArticleData: function (val) {
-      console.log(val);
-    }
   },
   methods:{
     getArticle(){
-      axios({
-        url: 'http://127.0.0.1:9999/api/article/',
-        method: 'post',
-        data:Qs.stringify({
-          token: this.$store.getters.userLoginStatus,
-          id:this.$route.query.id,
-        })
+      this.$axios.get("http://127.0.0.1:9999/api/blog/v1/article/", {
+        params: {
+          id: this.$route.query.id
+        }
+      // })
+      // axios({
+      //   url: 'http://127.0.0.1:9999/api/blog/v1/article/',
+      //   method: 'get',
+      //   params:{
+      //     id: this.$route.query.id,
+      //     token: this.$store.getters.userLoginStatus,
+      //   },
       }).then((res) => {
         this.article_title = res.data.article_title
         this.article_text = res.data.article_text

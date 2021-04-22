@@ -150,13 +150,12 @@ export default {
       }
     },
     getArticle(){
-      axios({
-        url: 'http://127.0.0.1:9999/api/article/',
-        method: 'post',
-        data:Qs.stringify({
-          token: this.$store.getters.userLoginStatus,
-          id:this.$route.query.id,
-        })
+      this.$axios({
+        url: 'http://127.0.0.1:9999/api/blog/v1/article/',
+        method: 'get',
+        params:{
+          id: this.$route.query.id,
+        },
       }).then((res) => {
         // console.log(res.data)
         this.article_data = res.data
@@ -165,7 +164,7 @@ export default {
     toLikes(state){
       if (this.$store.getters.userLoginStatus){
         axios({
-          url:'http://127.0.0.1:9999/api/like/',
+          url:'http://127.0.0.1:9999/api/blog/v1/like/',
           method:'post',
           data:Qs.stringify({
             article_id: this.$route.query.id,
@@ -187,7 +186,7 @@ export default {
     toCollections(state){
       if (this.$store.getters.userLoginStatus) {
         axios({
-          url:'http://127.0.0.1:9999/api/collection/',
+          url:'http://127.0.0.1:9999/api/blog/v1/collection/',
           method:'post',
           data:Qs.stringify({
             article_id: this.$route.query.id,
@@ -210,7 +209,7 @@ export default {
       if (this.textarea){
         if (this.$store.getters.userLoginStatus) {
           axios({
-        url: 'http://127.0.0.1:9999/api/comment/',
+        url: 'http://127.0.0.1:9999/api/blog/v1/comment/',
             method: 'post',
             data:Qs.stringify({
               token: this.$store.getters.userLoginStatus,
@@ -256,7 +255,7 @@ export default {
     },
     getCategory(){
       axios({
-        url:'http://127.0.0.1:9999/api/category/',
+        url:'http://127.0.0.1:9999/api/blog/v1/category/',
         method:'get',
       }).then((res) => {
         res.data.forEach((value) => {
@@ -269,7 +268,7 @@ export default {
     },
     getTag(){
       axios({
-        url:'http://127.0.0.1:9999/api/tag/',
+        url:'http://127.0.0.1:9999/api/blog/v1/tag/',
         method:'get',
       }).then((res) => {
         res.data.forEach((value) => {

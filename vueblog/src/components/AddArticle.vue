@@ -193,7 +193,7 @@ name: "AddArticle",
         return
       }
       axios({
-        url: 'http://127.0.0.1:9999/api/add-article/',
+        url: 'http://127.0.0.1:9999/api/blog/v1/add-article/',
         method: 'post',
         data:Qs.stringify({
           token: this.$store.getters.userLoginStatus,
@@ -223,7 +223,7 @@ name: "AddArticle",
     // 图片上传
     $imgAdd(pos, file){
       axios({
-        url: 'http://127.0.0.1:9999/api/add-article/',
+        url: 'http://127.0.0.1:9999/api/blog/v1/add-article/',
         method: 'post',
         data:Qs.stringify({
           img: JSON.stringify({
@@ -238,7 +238,7 @@ name: "AddArticle",
     },
     getCategory(){
       axios({
-        url:'http://127.0.0.1:9999/api/category/',
+        url:'http://127.0.0.1:9999/api/blog/v1/category/',
         method:'get',
       }).then((res) => {
         this.category = res.data
@@ -255,7 +255,7 @@ name: "AddArticle",
         return
       }
       axios({
-        url:'http://127.0.0.1:9999/api/category/',
+        url:'http://127.0.0.1:9999/api/blog/v1/category/',
         method:'post',
         data:Qs.stringify({
           "new_category": this.add_category_value
@@ -273,7 +273,7 @@ name: "AddArticle",
     },
     getTag(){
       axios({
-        url:'http://127.0.0.1:9999/api/tag/',
+        url:'http://127.0.0.1:9999/api/blog/v1/tag/',
         method:'get',
       }).then((res) => {
         this.tag = res.data
@@ -290,7 +290,7 @@ name: "AddArticle",
         return
       }
       axios({
-        url:'http://127.0.0.1:9999/api/tag/',
+        url:'http://127.0.0.1:9999/api/blog/v1/tag/',
         method:'post',
         data:Qs.stringify({
           "new_tag": this.add_tag_value

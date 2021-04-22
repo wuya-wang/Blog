@@ -10,15 +10,19 @@ import './assets/css/all.css'
 import './assets/iconfont/iconfont.css'
 import mavonEditor from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
+import axios from "./axios/interceptor";
 
 
 Vue.use(VueWechatTitle)
 Vue.use(mavonEditor)
 Vue.use(ElementUI);
 Vue.config.productionTip = false
+Vue.prototype.$axios = axios
 
 new Vue({
   router,
   store,
   render: h => h(App)
 }).$mount('#app')
+
+

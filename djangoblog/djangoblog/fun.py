@@ -6,8 +6,7 @@ from blog import models
 
 def article_list(articles, user):
     article_list_data = []
-    if len(user) > 0:
-        user = Token.objects.get(key=user[0]).user
+    if str(user) != "AnonymousUser":
         for article in articles:
             article_info = {
                 'article_id': article.id,

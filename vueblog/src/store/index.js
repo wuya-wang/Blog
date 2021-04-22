@@ -44,7 +44,7 @@ export default new Vuex.Store({
     // 登录
     loginUser({commit}, userinfo){
       axios({
-        url: 'http://127.0.0.1:9999/api/login/',
+        url: 'http://127.0.0.1:9999/api/blog/v1/login/',
         method: 'post',
         data: Qs.stringify(userinfo)
       }).then((res) => {
@@ -77,7 +77,7 @@ export default new Vuex.Store({
     // 注册
     registerUser({commit}, userinfo){
     axios({
-      url:'http://127.0.0.1:9999/api/register/',
+      url:'http://127.0.0.1:9999/api/blog/v1/register/',
       method:'post',
       data:Qs.stringify(userinfo)
     }).then((res) => {
@@ -125,7 +125,7 @@ export default new Vuex.Store({
     // 登出
     logout({commit},token){
       axios({
-        url:'http://127.0.0.1:9999/api/logout/',
+        url:'http://127.0.0.1:9999/api/blog/v1/logout/',
         method:'post',
         data:Qs.stringify({token})
       }).then()

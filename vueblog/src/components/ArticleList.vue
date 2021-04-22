@@ -52,14 +52,13 @@ export default {
   },
   methods:{
     getArticleList() {
-      axios({
-        url: 'http://127.0.0.1:9999/api/article-list/',
-        method: 'post',
-        data:Qs.stringify({
-          category:this.category,
+      this.$axios({
+        url: 'http://127.0.0.1:9999/api/blog/v1/article-list/',
+        method: 'get',
+        params: {
+          category: this.category,
           tag: this.tag,
-          token: this.$store.getters.userLoginStatus,
-        })
+        }
       }).then((res) => {
         // console.log(res.data)
         this.article_list = res.data
@@ -72,7 +71,7 @@ export default {
     toLikes(id, state){
       if (this.$store.getters.userLoginStatus){
       axios({
-        url:'http://127.0.0.1:9999/api/like/',
+        url:'http://127.0.0.1:9999/api/blog/v1/like/',
         method:'post',
         data:Qs.stringify({
           article_id: id,
@@ -95,7 +94,7 @@ export default {
     toCollections(id, state){
       if (this.$store.getters.userLoginStatus){
         axios({
-        url:'http://127.0.0.1:9999/api/collection/',
+        url:'http://127.0.0.1:9999/api/blog/v1/collection/',
         method:'post',
         data:Qs.stringify({
           article_id: id,

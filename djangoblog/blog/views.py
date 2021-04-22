@@ -3,16 +3,23 @@ import json
 import re
 import time
 from django.contrib.auth.hashers import check_password, make_password
+from rest_framework import permissions
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from blog import models
+from blog.permissions import IsAdminUserOrReadOnly
 from djangoblog import fun
 from django.views.generic.base import View
 
 
 # 用户名邮箱验证
 @api_view(['POST'])
+@permission_classes((AllowAny,))
 def uniqueness(request):
     email = request.POST.get('email')
     username = request.POST.get('username')
@@ -25,6 +32,7 @@ def uniqueness(request):
 
 # 注册
 @api_view(['POST'])
+@permission_classes((AllowAny,))
 def register(request):
     email = request.POST['email']
     username = request.POST['username']
@@ -63,6 +71,7 @@ def register(request):
 
 # 登录
 @api_view(['POST'])
+@permission_classes((AllowAny,))
 def login(request, ):
     username = request.POST.get('username')
     password = request.POST.get('password')
@@ -87,6 +96,7 @@ def login(request, ):
 
 # 登出
 @api_view(['POST'])
+@permission_classes((AllowAny,))
 def logout(request):
     token = request.POST.get('token')
     user_token = Token.objects.get(key=token)
@@ -106,7 +116,7 @@ def change_password(request):
 # 添加文章
 @api_view(['POST'])
 def add_article(request):
-    host = 'https://127.0.0.1:9999/'
+    host = 'http://127.0.0.1:9999/'
     img = request.POST.get('img')
     # 上传图片
     if img is not None:
@@ -146,53 +156,61 @@ def add_article(request):
 
 
 # 文章详情
-@api_view(['GET', "POST"])
-def article_data(request):
-    article_id = request.POST.get("id")
-    token = request.POST.get('token')
-    # print(token, article_id)
-    article = models.Article.objects.get(id=article_id)
-    comments_list = models.Comments.objects.filter(article=article, reply=None)
-    comments_info = fun.get_article_info(comments_list)
-    article_info = {
-        'article_title': article.title,
-        'article_text': article.text,
-        'article_time': article.create_time.strftime('%Y-%m-%d %H:%I:%S'),
-        'author': article.article_user.username,
-        'likes': '',
-        'collections': '',
-        'comments': '',
-        'comments_data': comments_info
-    }
-    if token is not None:
-        user = Token.objects.get(key=token).user
-        article_info['likes'] = models.Likes.objects.filter(article=article, state=1, user=user).count()
-        article_info['collections'] = models.Comments.objects.filter(article=article, user=user).count()
-        article_info['comments'] = models.Comments.objects.filter(article=article, user=user).count()
-    return Response(article_info)
+class ArticleDate(APIView):
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = (TokenAuthentication,)
+
+    @staticmethod
+    def get(request):
+        user = request.user
+        article_id = request.GET.get("id")
+        print(user, article_id)
+        article = models.Article.objects.get(id=article_id)
+        comments_list = models.Comments.objects.filter(article=article, reply=None)
+        comments_info = fun.get_article_info(comments_list)
+        article_info = {
+            'article_title': article.title,
+            'article_text': article.text,
+            'article_time': article.create_time.strftime('%Y-%m-%d %H:%I:%S'),
+            'author': article.article_user.username,
+            'likes': '',
+            'collections': '',
+            'comments': '',
+            'comments_data': comments_info
+        }
+        if str(user) != "AnonymousUser":
+            user = models.User.objects.get(username=user)
+            article_info['likes'] = models.Likes.objects.filter(article=article, state=1, user=user).count()
+            article_info['collections'] = models.Collection.objects.filter(article=article, state=1, user=user).count()
+            article_info['comments'] = models.Comments.objects.filter(article=article, user=user).count()
+        return Response(article_info)
 
 
 # 文章列表
-@api_view(['POST'])
-def article_list(request):
-    category_data = request.POST.get('category')
-    tag_data = request.POST.get('tag')
-    token = request.POST.get('token')
-    userinfo = Token.objects.filter(key=token)
-    if category_data is not None:
-        category_id = models.Category.objects.get(category=category_data)
-        articles = models.Article.objects.filter(article_category=category_id).order_by('id')
-        article_list_data = fun.article_list(articles, userinfo)
-        return Response(article_list_data)
-    if tag_data is not None:
-        tag_id = models.Tag.objects.get(tag=tag_data)
-        articles = models.Article.objects.filter(article_tag=tag_id).order_by('id')
-        article_list_data = fun.article_list(articles, userinfo)
-        return Response(article_list_data)
-    else:
-        articles = models.Article.objects.all().order_by('id')
-        article_list_data = fun.article_list(articles, userinfo)
-        return Response(article_list_data)
+class ArticleList(APIView):
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = (TokenAuthentication,)
+
+    @staticmethod
+    def get(request):
+        category_data = request.GET.get('category')
+        tag_data = request.GET.get('tag')
+        user = request.user
+        print(category_data, tag_data, user)
+        if category_data is not None:
+            category_id = models.Category.objects.get(category=category_data)
+            articles = models.Article.objects.filter(article_category=category_id).order_by('id')
+            article_list_data = fun.article_list(articles, user)
+            return Response(article_list_data)
+        if tag_data is not None:
+            tag_id = models.Tag.objects.get(tag=tag_data)
+            articles = models.Article.objects.filter(article_tag=tag_id).order_by('id')
+            article_list_data = fun.article_list(articles, user)
+            return Response(article_list_data)
+        else:
+            articles = models.Article.objects.all().order_by('id')
+            article_list_data = fun.article_list(articles, user)
+            return Response(article_list_data)
 
 
 # 分类
@@ -215,9 +233,10 @@ def category(request):
 
 
 # 标签
-@api_view(['GET', 'POST'])
-def tag(request):
-    if request.method == 'GET':
+class TagView(APIView):
+    permission_classes = (IsAdminUserOrReadOnly,)
+
+    def get(self, request):
         tag_data = []
         tags = models.Tag.objects.all()
         for i in tags:
@@ -227,14 +246,16 @@ def tag(request):
             }
             tag_data.append(tag_info)
         return Response(tag_data)
-    if request.method == 'POST':
+
+    def post(self, request):
         new_tag = request.POST.get('new_tag')
         models.Tag(tag=new_tag).save()
-    return Response('ok')
+        return Response('ok')
 
 
 # 点赞
 @api_view(['POST'])
+@permission_classes((AllowAny,))
 def like(request):
     token = request.POST.get('token')
     article_id = request.POST.get('article_id')
@@ -252,6 +273,7 @@ def like(request):
 
 # 收藏
 @api_view(['POST'])
+@permission_classes((AllowAny,))
 def collection(request):
     token = request.POST.get('token')
     article_id = request.POST.get('article_id')
@@ -269,6 +291,7 @@ def collection(request):
 
 # 评论
 @api_view(['POST'])
+@permission_classes((IsAuthenticated,))
 def comment(request):
     token = request.POST.get('token')
     article_id = request.POST.get('article_id')
@@ -286,3 +309,5 @@ def comment(request):
         new_comment = models.Comments(article=article, user=user, text=comment_data)
         new_comment.save()
         return Response('ok')
+
+

@@ -346,4 +346,7 @@ p{
 .el-menu-item-group__title{
  padding: 0;
 }
+.el-drawer__wrapper {
+  min-height: 100vh;
+}
 </style>

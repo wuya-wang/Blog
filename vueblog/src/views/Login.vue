@@ -1,5 +1,5 @@
 <template>
-  <div class="login">
+  <div class="login" :style="{ height: bodyHeight + 'px' }">
     <div class="login-main">
       <div class="navbar">
         <div class="navbar-register" @click="goRegister()">
@@ -12,7 +12,7 @@
         </div>
       </div>
       <el-row>
-        <el-col :xs="20" :sm="16" :md="10" :lg="6" :xl="6">
+        <el-col :xs="20" :sm="16" :md="10" :lg="6" :xl="6" :style="{top: Top + 'px'}">
           <div class="login-box">
             <el-card class="box-card">
               <div slot="header" class="clearfix login__card_title">
@@ -46,8 +46,13 @@ export default {
       userinfo:{
         username:'',
         password:"",
-      }
+      },
+      bodyHeight:document.documentElement.clientHeight,
+      Top: document.documentElement.clientHeight / 4
     }
+  },
+  mounted() {
+     this.bodyHeight = document.documentElement.clientHeight
   },
   methods:{
     // 输入框焦点事件
@@ -80,7 +85,7 @@ export default {
 
 <style scoped>
 .login{
-  height: 100vh;
+  height: 100%;
   width: 100vw;
   background: url("../assets/img/IMG_0102.png") center;
   background-size: cover;
@@ -129,7 +134,6 @@ p{
 .el-col{
   position: absolute;
   left: 50%;
-  top: 200px;
   transform: translate(-50%);
   animation: login_card 1s ease-out 1 forwards;
 }
