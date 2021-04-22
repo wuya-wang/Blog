@@ -163,12 +163,11 @@ export default {
     },
     toLikes(state){
       if (this.$store.getters.userLoginStatus){
-        axios({
+        this.$axios({
           url:'http://127.0.0.1:9999/api/blog/v1/like/',
           method:'post',
           data:Qs.stringify({
             article_id: this.$route.query.id,
-            token: this.$store.getters.userLoginStatus,
             state: !state,
           })
         }).then(() => {

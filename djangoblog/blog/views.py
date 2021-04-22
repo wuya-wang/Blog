@@ -3,11 +3,11 @@ import json
 import re
 import time
 from django.contrib.auth.hashers import check_password, make_password
-from rest_framework import permissions
+from rest_framework import permissions, pagination
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -114,45 +114,47 @@ def change_password(request):
 
 
 # 添加文章
-@api_view(['POST'])
-def add_article(request):
-    host = 'http://127.0.0.1:9999/'
-    img = request.POST.get('img')
-    # 上传图片
-    if img is not None:
-        img = json.loads(img)
-        img_url = img['url']
-        img_name = img['name']
-        img_url_list = img_url.split(',')
-        img_data = base64.b64decode(img_url_list[1])
-        image_name = int(round(time.time() * 1000))
-        img_url = 'media/img' + '/' + str(image_name) + '-' + img_name
-        with open(img_url, 'wb') as f:
-            f.write(img_data)
-        return Response(host + img_url)
-    # 添加文章
-    token = request.POST.get('token')
-    article_text = request.POST.get('article_text')
-    article_title = request.POST.get('article_title')
-    article_desc = request.POST.get('article_introduce')
-    article_category = request.POST.get('article_category')
-    article_tag = json.loads(request.POST.get('article_tag'))
-    print(article_tag)
-    user_token = Token.objects.get(key=token)
-    user = models.User.objects.get(id=user_token.user_id)
-    # 存储外键与普通字段
-    article_category_data = models.Category.objects.get(category=article_category)
-    article_info = models.Article(
-        title=article_title, desc=article_desc, text=article_text,
-        article_user=user, article_category=article_category_data)
-    article_info.save()
-    # 获取多对多关系字段
-    for tag in article_tag:
-        article_tag_data = models.Tag.objects.get(tag=tag)
-        # 使用add()方法存储多对多关系
-        article_info.article_tag.add(article_tag_data)
-    article_info.save()
-    return Response('OK')
+class AddArticle(APIView):
+    permission_classes = (IsAdminUser,)
+    authentication_classes = (TokenAuthentication,)
+
+    @staticmethod
+    def post(request):
+        host = 'http://127.0.0.1:9999/'
+        img = request.POST.get('img')
+        # 上传图片
+        if img is not None:
+            img = json.loads(img)
+            img_url = img['url']
+            img_name = img['name']
+            img_url_list = img_url.split(',')
+            img_data = base64.b64decode(img_url_list[1])
+            image_name = int(round(time.time() * 1000))
+            img_url = 'media/img' + '/' + str(image_name) + '-' + img_name
+            with open(img_url, 'wb') as f:
+                f.write(img_data)
+            return Response(host + img_url)
+        # 添加文章
+        user = request.user
+        article_text = request.POST.get('article_text')
+        article_title = request.POST.get('article_title')
+        article_desc = request.POST.get('article_introduce')
+        article_category = request.POST.get('article_category')
+        article_tag = json.loads(request.POST.get('article_tag'))
+        # print(article_tag)
+        # 存储外键与普通字段
+        article_category_data = models.Category.objects.get(category=article_category)
+        article_info = models.Article(
+            title=article_title, desc=article_desc, text=article_text,
+            article_user=user, article_category=article_category_data)
+        article_info.save()
+        # 获取多对多关系字段
+        for tag in article_tag:
+            article_tag_data = models.Tag.objects.get(tag=tag)
+            # 使用add()方法存储多对多关系
+            article_info.article_tag.add(article_tag_data)
+        article_info.save()
+        return Response('OK')
 
 
 # 文章详情
@@ -164,7 +166,7 @@ class ArticleDate(APIView):
     def get(request):
         user = request.user
         article_id = request.GET.get("id")
-        print(user, article_id)
+        # print(user, article_id)
         article = models.Article.objects.get(id=article_id)
         comments_list = models.Comments.objects.filter(article=article, reply=None)
         comments_info = fun.get_article_info(comments_list)
@@ -196,27 +198,42 @@ class ArticleList(APIView):
         category_data = request.GET.get('category')
         tag_data = request.GET.get('tag')
         user = request.user
-        print(category_data, tag_data, user)
+        # print(category_data, tag_data, user)
         if category_data is not None:
             category_id = models.Category.objects.get(category=category_data)
             articles = models.Article.objects.filter(article_category=category_id).order_by('id')
             article_list_data = fun.article_list(articles, user)
-            return Response(article_list_data)
+            page = pagination.PageNumberPagination()
+            page.page_size = 7
+            page.max_page_size = 7
+            page_roles = page.paginate_queryset(queryset=article_list_data, request=request)
+            return page.get_paginated_response(page_roles)
         if tag_data is not None:
             tag_id = models.Tag.objects.get(tag=tag_data)
             articles = models.Article.objects.filter(article_tag=tag_id).order_by('id')
             article_list_data = fun.article_list(articles, user)
-            return Response(article_list_data)
+            page = pagination.PageNumberPagination()
+            page.page_size = 7
+            page.max_page_size = 7
+            page_roles = page.paginate_queryset(queryset=article_list_data, request=request)
+            return page.get_paginated_response(page_roles)
         else:
             articles = models.Article.objects.all().order_by('id')
             article_list_data = fun.article_list(articles, user)
-            return Response(article_list_data)
+            # 实例化分页器对象
+            page = pagination.PageNumberPagination()
+            page.page_size = 7
+            page.max_page_size = 7
+            page_roles = page.paginate_queryset(queryset=article_list_data, request=request)
+            return page.get_paginated_response(page_roles)
 
 
 # 分类
-@api_view(['GET', 'POST'])
-def category(request):
-    if request.method == 'GET':
+class Category(APIView):
+    authentication_classes = (TokenAuthentication,)
+
+    @staticmethod
+    def get(request):
         category_data = []
         category_all = models.Category.objects.all()
         for i in category_all:
@@ -226,17 +243,20 @@ def category(request):
             }
             category_data.append(category_info)
         return Response(category_data)
-    if request.method == 'POST':
+
+    @permission_classes((IsAdminUser,))
+    def post(self, request):
         new_category = request.POST.get('new_category')
         models.Category(category=new_category).save()
-    return Response('ok')
+        return Response('ok')
 
 
 # 标签
 class TagView(APIView):
-    permission_classes = (IsAdminUserOrReadOnly,)
+    authentication_classes = (TokenAuthentication,)
 
-    def get(self, request):
+    @staticmethod
+    def get(request):
         tag_data = []
         tags = models.Tag.objects.all()
         for i in tags:
@@ -247,6 +267,7 @@ class TagView(APIView):
             tag_data.append(tag_info)
         return Response(tag_data)
 
+    @permission_classes((IsAdminUser,))
     def post(self, request):
         new_tag = request.POST.get('new_tag')
         models.Tag(tag=new_tag).save()
@@ -254,39 +275,48 @@ class TagView(APIView):
 
 
 # 点赞
-@api_view(['POST'])
-@permission_classes((AllowAny,))
-def like(request):
-    token = request.POST.get('token')
-    article_id = request.POST.get('article_id')
-    state = json.loads(request.POST.get("state"))
-    user = Token.objects.get(key=token).user
-    article = models.Article.objects.get(id=article_id)
-    likes = models.Likes.objects.filter(article=article, user=user)
-    if len(likes) != 0:
-        likes.update(state=state)
-    else:
-        new_likes = models.Likes(user=user, article=article, state=state)
-        new_likes.save()
-    return Response('ok')
+
+class Like(APIView):
+    # 权限控制
+    permission_classes = (permissions.AllowAny,)
+    # 认证
+    authentication_classes = (TokenAuthentication,)
+
+    @staticmethod
+    def post(request):
+        user = request.user
+        article_id = request.POST.get('article_id')
+        state = json.loads(request.POST.get("state"))
+        article = models.Article.objects.get(id=article_id)
+        likes = models.Likes.objects.filter(article=article, user=user)
+        if len(likes) != 0:
+            likes.update(state=state)
+        else:
+            new_likes = models.Likes(user=user, article=article, state=state)
+            new_likes.save()
+        return Response('ok')
 
 
 # 收藏
-@api_view(['POST'])
-@permission_classes((AllowAny,))
-def collection(request):
-    token = request.POST.get('token')
-    article_id = request.POST.get('article_id')
-    state = json.loads(request.POST.get("state"))
-    user = Token.objects.get(key=token).user
-    article = models.Article.objects.get(id=article_id)
-    collections = models.Collection.objects.filter(article=article, user=user)
-    if len(collections) != 0:
-        collections.update(state=state)
-    else:
-        new_collections = models.Collection(user=user, article=article, state=state)
-        new_collections.save()
-    return Response('ok')
+class Collection(APIView):
+    # 权限控制
+    permission_classes = (permissions.AllowAny,)
+    # 认证
+    authentication_classes = (TokenAuthentication,)
+
+    @staticmethod
+    def post(request):
+        user = request.user
+        article_id = request.POST.get('article_id')
+        state = json.loads(request.POST.get("state"))
+        article = models.Article.objects.get(id=article_id)
+        collections = models.Collection.objects.filter(article=article, user=user)
+        if len(collections) != 0:
+            collections.update(state=state)
+        else:
+            new_collections = models.Collection(user=user, article=article, state=state)
+            new_collections.save()
+        return Response('ok')
 
 
 # 评论

@@ -23,11 +23,18 @@
 
       </div>
     </div>
+    <el-pagination
+    layout="prev, pager, next"
+    hide-on-single-page
+    :page-size="PageSize"
+    :current-page="CurrentPage"
+    :total="Total"
+    @current-change=currentChange>
+  </el-pagination>
   </div>
 </template>
 
 <script>
-import axios from "axios";
 import Qs from "qs";
 // import Vue from "vue"
 export default {
@@ -37,10 +44,13 @@ export default {
       article_list: [],
       category: this.$route.query.category,
       tag: this.$route.query.tag,
+      PageSize: 7,  // 每页数量
+      CurrentPage: 1,  // 默认页
+      Total: 100,
     }
   },
   created() {
-    this.getArticleList()
+    this.getArticleList(this.CurrentPage)
   },
   watch: {
     // 监听路由变化
@@ -51,18 +61,25 @@ export default {
     }
   },
   methods:{
-    getArticleList() {
+    getArticleList(page) {
       this.$axios({
         url: 'http://127.0.0.1:9999/api/blog/v1/article-list/',
         method: 'get',
         params: {
+          page,
           category: this.category,
           tag: this.tag,
         }
       }).then((res) => {
         // console.log(res.data)
-        this.article_list = res.data
+        this.article_list = res.data.results
+        this.Total = res.data.count
       })
+    },
+    currentChange(val){
+      // console.log(val)
+      this.CurrentPage = val
+      this.getArticleList(val)
     },
     getArticle(id){
       // console.log(id)
@@ -70,16 +87,15 @@ export default {
     },
     toLikes(id, state){
       if (this.$store.getters.userLoginStatus){
-      axios({
+      this.$axios({
         url:'http://127.0.0.1:9999/api/blog/v1/like/',
         method:'post',
         data:Qs.stringify({
           article_id: id,
-          token: this.$store.getters.userLoginStatus,
           state: !state,
         })
       }).then(() => {
-        this.getArticleList()
+        this.getArticleList(this.CurrentPage)
         // Vue.set(this.article_list, index, {likes:!state})
       })
       }else{
@@ -93,16 +109,15 @@ export default {
     },
     toCollections(id, state){
       if (this.$store.getters.userLoginStatus){
-        axios({
+        this.$axios({
         url:'http://127.0.0.1:9999/api/blog/v1/collection/',
         method:'post',
         data:Qs.stringify({
           article_id: id,
-          token: this.$store.getters.userLoginStatus,
           state: !state,
         })
       }).then(() => {
-        this.getArticleList()
+        this.getArticleList(this.CurrentPage)
         // Vue.set(this.article_list, index, {likes:!state})
       })
       } else {
@@ -133,11 +148,12 @@ export default {
 .card-title:hover{
   color: #3069e0;
 }
-.iconfont{
+.card .iconfont{
   font-size: 1.3rem;
   margin: 0 .1rem 0 .5rem;
 }
-span{
-
+#article-list >>> .el-icon {
+  position: static;
+  color: #000000;
 }
 </style>

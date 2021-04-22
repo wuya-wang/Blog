@@ -27,12 +27,12 @@ urlpatterns = [
     path('uniqueness/', views.uniqueness),   # 验证邮箱与用户名唯一性
     path('changepassword/', views.change_password),  # 修改密码
     # 文章管理
-    path('add-article/', views.add_article),  # 添加文章
+    path('add-article/', views.AddArticle.as_view()),  # 添加文章
     path('article/', views.ArticleDate.as_view()),  # 文章详情
     path('article-list/', views.ArticleList.as_view()),  # 文章列表
-    path('category/', views.category),  # 分类
+    path('category/', views.Category.as_view()),  # 分类
     path('tag/', views.TagView.as_view()),
-    path('like/', views.like),      # 点赞
-    path('collection/', views.collection),   # 收藏
+    path('like/', views.Like.as_view()),      # 点赞
+    path('collection/', views.Collection.as_view()),   # 收藏
     path('comment/', views.comment),  # 评论
 ]

@@ -192,11 +192,10 @@ name: "AddArticle",
         });
         return
       }
-      axios({
+      this.$axios({
         url: 'http://127.0.0.1:9999/api/blog/v1/add-article/',
         method: 'post',
         data:Qs.stringify({
-          token: this.$store.getters.userLoginStatus,
           article_text: render,
           article_title: this.article.title,
           article_introduce: this.article.introduce,
@@ -237,7 +236,7 @@ name: "AddArticle",
       })
     },
     getCategory(){
-      axios({
+      this.$axios({
         url:'http://127.0.0.1:9999/api/blog/v1/category/',
         method:'get',
       }).then((res) => {
@@ -254,7 +253,7 @@ name: "AddArticle",
         });
         return
       }
-      axios({
+      this.$axios({
         url:'http://127.0.0.1:9999/api/blog/v1/category/',
         method:'post',
         data:Qs.stringify({
@@ -272,7 +271,7 @@ name: "AddArticle",
       })
     },
     getTag(){
-      axios({
+      this.$axios({
         url:'http://127.0.0.1:9999/api/blog/v1/tag/',
         method:'get',
       }).then((res) => {
@@ -289,7 +288,7 @@ name: "AddArticle",
         });
         return
       }
-      axios({
+      this.$axios({
         url:'http://127.0.0.1:9999/api/blog/v1/tag/',
         method:'post',
         data:Qs.stringify({
