@@ -199,5 +199,5 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
 }
 # 阿里云管理账号
-AccessKeyID = "LTAI5tBtJo7As9x4SWX28o7W"
-AccessKeySecret = "LTsy21FhQBcHV3dEbuLhJh20dzmAqR"
+AccessKeyID = ""
+AccessKeySecret = ""
