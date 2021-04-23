@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path, re_path, include
 from django.views.static import serve
 from django.conf import settings
+from djangoblog import captcha
 import debug_toolbar
 from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView,)
 
@@ -26,6 +27,7 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('api/token/', TokenObtainPairView.as_view()),
     path('api/token/refresh/', TokenRefreshView.as_view()),
+    path('api/captcha/',  captcha.Captcha.as_view()),
     # 静态资源库访问路径
     re_path(r"static/(?P<path>.*)$", serve, {"document_root": settings.STATIC_ROOT}),
     # 媒体库访问路径

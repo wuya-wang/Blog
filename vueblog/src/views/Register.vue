@@ -18,7 +18,7 @@
               <div slot="header" class="clearfix login__card_title">
                 <span>REGISTER</span>
               </div>
-              <div class="form">
+              <div class="form" v-show="Register">
                  <div class="input" :class="{'focus':focusEmail}" placeholder="Email">
                   <el-input @focus="inEmail()" @blur="outEmail()" v-model="userinfo.email" type="text"></el-input>
                 </div>
@@ -32,7 +32,8 @@
                   <el-input @focus="inReward()" @blur="outReward()" v-model="userinfo.reward" type="password" show-password></el-input>
                 </div>
               </div>
-              <el-button class="login__button" type="text" @click="registerUser()" @keyup.enter="registerUser()">Let's go</el-button>
+              <el-button v-show="Register" class="login__button" type="text" @click="registerUser()" @keyup.enter="registerUser()">Let's go</el-button>
+              <Captcha v-show="!Register" @handleSlideAly="postCaptcha" :callbackData='callbackData'></Captcha>
             </el-card>
           </div>
         </el-col>
@@ -44,11 +45,15 @@
 <script>
 import axios from "axios";
 import Qs from "qs";
+import Captcha from "@/components/Captcha";
 
 export default {
   name: "Register",
   data(){
     return{
+      Register:'1',
+      captchaData:"",
+      callbackData:'',
       focusEmail:false,
       focusUsername:false,
       focusPassword:false,
@@ -66,7 +71,37 @@ export default {
   mounted() {
      this.bodyHeight = document.documentElement.clientHeight
   },
+  components:{
+    Captcha
+  },
+
   methods:{
+    postCaptcha(data){
+      this.captchaData = data
+      console.log(this.captchaData)
+      axios({
+        url:"http://127.0.0.1:9999/api/captcha/",
+        method:'post',
+        data: Qs.stringify({
+          captcha_data: JSON.stringify(this.captchaData),
+        }),
+      }).then((res) => {
+        console.log(res.data)
+        this.callbackData = res.data
+        if (this.callbackData === "100"){
+        this.$store.dispatch('registerUser', this.userinfo)
+      } else {
+         this.$message({
+          showClose: true,
+          message: '验证失败，请重试一次',
+          type: 'error',
+          center: true,
+        });
+        return
+      }
+      })
+
+    },
     // 输入框焦点事件
     inEmail(){this.focusEmail = true},
     outEmail(){if (this.userinfo.email.length === 0){this.focusEmail = false}else {
@@ -175,7 +210,8 @@ export default {
         });
         return
       }
-      this.$store.dispatch('registerUser', this.userinfo)
+      this.Register = 0
+
     },
   }
 }
