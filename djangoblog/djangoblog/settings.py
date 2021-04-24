@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import os
 from datetime import timedelta
 from pathlib import Path
+import djcelery
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -42,6 +43,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
+    'celery',
+    'djcelery',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -198,6 +202,33 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
 }
-# 阿里云管理账号
-AccessKeyID = "LTAI5tBtJo7As9x4SWX28o7W"
-AccessKeySecret = "LTsy21FhQBcHV3dEbuLhJh20dzmAqR"
+
+AccessKeyID = ""
+AccessKeySecret = ""
+
+# celery配置
+BROKER_URL = 'redis://127.0.0.1:6379/4'  # 使用redid做broker，消息代理、队列
+CELERY_RESULT_BACKEND = 'django-db'  # 需要跟踪任务的状态时保存结果和状态，结果存储
+CELERY_TIMEZONE = 'Asia/Shanghai'  # 默认上海时区
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+# CELERY_IMPORTS = ("blog.tasks",)  # 注册tasks
+CELERYD_TASK_TIME_LIMIT = 20 * 30  # celery任务最长执行时间，超时kill
+djcelery.setup_loader()
+
+
+# smtp服务的邮箱服务器
+EMAIL_HOST = 'smtp.qq.com'
+# smtp服务固定的端口是25
+EMAIL_PORT = 25
+# 发送邮件的邮箱
+EMAIL_HOST_USER = ''
+# 在邮箱中设置的客户端授权码
+EMAIL_HOST_PASSWORD = ''
+# 收件人看到的发件人<此处要与发送邮件的邮箱相同>
+EMAIL_FROM = ''
+
+try:
+    from local_settings import *
+except ImportError:
+    pass

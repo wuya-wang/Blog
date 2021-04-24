@@ -1,8 +1,10 @@
 import base64
 import json
+import random
 import re
 import time
 from django.contrib.auth.hashers import check_password, make_password
+from django.core.mail import send_mail
 from rest_framework import permissions, pagination
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
@@ -13,11 +15,15 @@ from rest_framework.views import APIView
 
 from blog import models
 from blog.permissions import IsAdminUserOrReadOnly
+from blog.tasks import email
 from djangoblog import fun
 from django.views.generic.base import View
 
 
 # 用户名邮箱验证
+from djangoblog.settings import EMAIL_HOST_USER
+
+
 @api_view(['POST'])
 @permission_classes((AllowAny,))
 def uniqueness(request):
@@ -341,3 +347,14 @@ def comment(request):
         return Response('ok')
 
 
+# cerely任务
+class Celery(APIView):
+    # 权限控制
+    permission_classes = (permissions.AllowAny,)
+    # 认证
+    authentication_classes = ()
+
+    def post(self, request):
+        e_mail = request.POST.get('email')
+        email.delay(e_mail)
+        return Response('ok')

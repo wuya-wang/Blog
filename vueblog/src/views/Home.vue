@@ -27,7 +27,9 @@
           <i class="el-icon-notebook-1"></i>
           <span slot="title">个人博客</span>
         </el-menu-item>
-        <el-submenu index="3">
+
+        <div v-if="this.$store.state.userinfo.username === this.superuser">
+          <el-submenu index="3">
           <template slot="title">
             <i class="el-icon-folder-opened"></i>
             <span>Demo</span>
@@ -39,7 +41,6 @@
             <el-menu-item index="/chat"><i class="el-icon-chat-dot-square"></i>在线聊天</el-menu-item>
           </el-menu-item-group>
         </el-submenu>
-        <div v-if="this.$store.state.userinfo.username === this.superuser">
           <el-menu-item index="/add-article">
             <i class="el-icon-edit"></i>
             <span slot="title">文章编辑</span>
@@ -59,7 +60,7 @@
         </div>
         <el-menu-item index="/other-world">
           <i class="el-icon-picture-outline"></i>
-          <span slot="title">里世界</span>
+          <span slot="title">关于我</span>
         </el-menu-item>
       </el-menu>
     </div>
@@ -97,7 +98,8 @@
               <i class="el-icon-notebook-1"></i>
               <span slot="title">个人博客</span>
             </el-menu-item>
-            <el-submenu index="3">
+            <div v-if="this.$store.state.userinfo.username === this.superuser">
+              <el-submenu  index="3">
               <template slot="title">
                 <i class="el-icon-folder-opened"></i>
                 <span>Demo</span>
@@ -109,7 +111,6 @@
                 <el-menu-item @click="drawer = false" index="/chat"><i class="el-icon-chat-dot-square"></i>在线聊天</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
-            <div v-if="this.$store.state.userinfo.username === this.superuser">
               <el-menu-item @click="drawer = false" index="/add-article">
                 <i class="el-icon-edit"></i>
                 <span slot="title">文章编辑</span>
@@ -129,7 +130,7 @@
             </div>
             <el-menu-item @click="drawer = false" index="/other-world">
               <i class="el-icon-picture-outline"></i>
-              <span slot="title">里世界</span>
+              <span slot="title">关于我</span>
             </el-menu-item>
           </el-menu>
         </div>

@@ -39,6 +39,14 @@ const routes = [
                 },
             },
             {
+                path: '/other-world',
+                name: 'OtherWorld',
+                component: () => import('../components/OtherWorld.vue'),
+                meta: {
+                    title: "里世界"
+                },
+            },
+            {
                 path:'/visualization',
                 name:'Visualization',
                 component:() => import('../components/Visualization'),
@@ -133,14 +141,7 @@ const routes = [
             title: "注册"
         },
     },
-    {
-        path: '/other-world',
-        name: 'OtherWorld',
-        component: () => import('../views/OtherWorld.vue'),
-        meta: {
-            title: "里世界"
-        },
-    },
+
 
 
 

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span>里世界 待开发</span>
+    <span>关于我..............</span>
   </div>
 </template>
 
