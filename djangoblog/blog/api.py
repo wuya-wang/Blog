@@ -35,5 +35,5 @@ urlpatterns = [
     path('like/', views.Like.as_view()),      # 点赞
     path('collection/', views.Collection.as_view()),   # 收藏
     path('comment/', views.comment),  # 评论
-    path('celery/', views.Celery.as_view()),  # celery测试
+    path('get-verification-code/', views.GetVerificationCode.as_view()),  # celery测试
 ]

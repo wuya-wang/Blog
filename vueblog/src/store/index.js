@@ -117,6 +117,15 @@ export default new Vuex.Store({
         });
         return;
       }
+      if (res.data === '验证码错误'){
+        Vue.prototype.$message({
+          showClose: true,
+          message: '验证码错误',
+          type: 'error',
+          center: true,
+        });
+        return;
+      }
       commit('saveUserinfo', res.data)
       localStorage.setItem('token', res.data.token)
       $router.push({path: '/'}).then(()=>{});

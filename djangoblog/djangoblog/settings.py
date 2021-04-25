@@ -101,6 +101,16 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "CONNECTION_POOL_KWARGS": {"max_connections": 100},  # 连接池设置
+        }
+    }
+}
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
@@ -203,16 +213,12 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
 }
 
-AccessKeyID = ""
-AccessKeySecret = ""
-
 # celery配置
 BROKER_URL = 'redis://127.0.0.1:6379/4'  # 使用redid做broker，消息代理、队列
 CELERY_RESULT_BACKEND = 'django-db'  # 需要跟踪任务的状态时保存结果和状态，结果存储
 CELERY_TIMEZONE = 'Asia/Shanghai'  # 默认上海时区
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-# CELERY_IMPORTS = ("blog.tasks",)  # 注册tasks
 CELERYD_TASK_TIME_LIMIT = 20 * 30  # celery任务最长执行时间，超时kill
 djcelery.setup_loader()
 
@@ -222,11 +228,10 @@ EMAIL_HOST = 'smtp.qq.com'
 # smtp服务固定的端口是25
 EMAIL_PORT = 25
 # 发送邮件的邮箱
-EMAIL_HOST_USER = ''
+EMAIL_HOST_USER = '421405896@qq.com'
 # 在邮箱中设置的客户端授权码
-EMAIL_HOST_PASSWORD = ''
-# 收件人看到的发件人<此处要与发送邮件的邮箱相同>
-EMAIL_FROM = ''
+EMAIL_HOST_PASSWORD = 'xkkdwatqxqyxbjfe'
+
 
 try:
     from local_settings import *

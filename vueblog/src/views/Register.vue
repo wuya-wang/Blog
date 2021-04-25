@@ -31,9 +31,15 @@
                 <div class="input" :class="{'focus':focusReward}" placeholder="Reward">
                   <el-input @focus="inReward()" @blur="outReward()" v-model="userinfo.reward" type="password" show-password></el-input>
                 </div>
+                <div class="input" :class="{'focus':focusVerificationCode}" placeholder="Verification code">
+                  <el-input @focus="inVerificationCode()" @blur="outVerificationCode()" v-model="userinfo.verificationCode"></el-input>
+                </div>
+                <div style="position: relative; margin: 0 1.5rem; top: -0.5rem; text-align: center " >
+                  <el-button round style="background-color: #FFFFFF45" @click="getVerificationCode()" :disabled="status">
+                    {{ msg }}</el-button>
+                </div>
               </div>
               <el-button v-show="Register" class="login__button" type="text" @click="registerUser()" @keyup.enter="registerUser()">Let's go</el-button>
-              <Captcha v-show="!Register" @handleSlideAly="postCaptcha" :callbackData='callbackData'></Captcha>
             </el-card>
           </div>
         </el-col>
@@ -45,12 +51,13 @@
 <script>
 import axios from "axios";
 import Qs from "qs";
-import Captcha from "@/components/Captcha";
 
 export default {
   name: "Register",
   data(){
     return{
+      status: false,
+      msg:'获取验证码',
       Register:'1',
       captchaData:"",
       callbackData:'',
@@ -58,11 +65,13 @@ export default {
       focusUsername:false,
       focusPassword:false,
       focusReward:false,
+      focusVerificationCode:false,
       userinfo:{
         username:'',
         password:'',
         reward:'',
         email:'',
+        verificationCode:'',
       },
       bodyHeight: document.documentElement.clientHeight,
       Top: document.documentElement.clientHeight / 4 - 50
@@ -72,35 +81,22 @@ export default {
      this.bodyHeight = document.documentElement.clientHeight
   },
   components:{
-    Captcha
+
   },
 
   methods:{
-    postCaptcha(data){
-      this.captchaData = data
-      console.log(this.captchaData)
-      axios({
-        url:"http://127.0.0.1:9999/api/captcha/",
+    getVerificationCode(){
+      this.$axios({
+        url:"http://127.0.0.1:9999/api/blog/v1/get-verification-code/",
         method:'post',
-        data: Qs.stringify({
-          captcha_data: JSON.stringify(this.captchaData),
-        }),
+        data:Qs.stringify({
+          email: this.userinfo.email,
+        })
       }).then((res) => {
+        this.status = true
+        this.msg = "已发送"
         console.log(res.data)
-        this.callbackData = res.data
-        if (this.callbackData === "100"){
-        this.$store.dispatch('registerUser', this.userinfo)
-      } else {
-         this.$message({
-          showClose: true,
-          message: '验证失败，请重试一次',
-          type: 'error',
-          center: true,
-        });
-        return
-      }
       })
-
     },
     // 输入框焦点事件
     inEmail(){this.focusEmail = true},
@@ -147,6 +143,8 @@ export default {
     outPassword(){if (this.userinfo.password.length === 0){this.focusPassword = false}},
     inReward(){this.focusReward = true},
     outReward(){if (this.userinfo.reward.length === 0){this.focusReward = false}},
+    inVerificationCode(){this.focusVerificationCode = true},
+    outVerificationCode(){if (this.verificationCode.length === 0){this.focusVerificationCode = false}},
     goRegister(){
       this.$router.push({name:'Register'})
     },
@@ -164,7 +162,8 @@ export default {
       if (this.userinfo.email.length === 0||
           this.userinfo.username.length === 0||
           this.userinfo.password.length === 0||
-          this.userinfo.reward.length === 0
+          this.userinfo.reward.length === 0 ||
+          this.verificationCode === 0
       ){
         this.$message({
           showClose: true,
@@ -210,8 +209,7 @@ export default {
         });
         return
       }
-      this.Register = 0
-
+      this.$store.dispatch('registerUser', this.userinfo)
     },
   }
 }

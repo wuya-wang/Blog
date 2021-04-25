@@ -5,6 +5,7 @@ import re
 import time
 from django.contrib.auth.hashers import check_password, make_password
 from django.core.mail import send_mail
+from django.core.cache import cache
 from rest_framework import permissions, pagination
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
@@ -36,6 +37,20 @@ def uniqueness(request):
     return Response('OK')
 
 
+# 生成邮箱验证码
+class GetVerificationCode(APIView):
+    # 权限控制
+    permission_classes = (permissions.AllowAny,)
+    # 认证
+    authentication_classes = ()
+
+    def post(self, request):
+        e_mail = request.POST.get('email')
+        e_mail = str(e_mail)
+        email.delay(e_mail)
+        return Response('ok')
+
+
 # 注册
 @api_view(['POST'])
 @permission_classes((AllowAny,))
@@ -44,6 +59,8 @@ def register(request):
     username = request.POST['username']
     password = request.POST['password']
     reward = request.POST['reward']
+    verification_code = request.POST["verificationCode"]
+    cache_verification_code = cache.get(email)
     # 验证信息
     re_email = re.search(r'^([a-zA-Z]|[0-9])(\w|)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$', email)
     if re_email:
@@ -63,6 +80,8 @@ def register(request):
         return Response('error_password')
     if password != reward:
         return Response('密码不一致')
+    if cache_verification_code != verification_code:
+        return Response("验证码错误")
     new_password = make_password(password)
     user = models.User(email=email, username=username, password=new_password)
     user.save()
@@ -347,14 +366,18 @@ def comment(request):
         return Response('ok')
 
 
-# cerely任务
-class Celery(APIView):
+# 验证
+class Verification(APIView):
     # 权限控制
     permission_classes = (permissions.AllowAny,)
     # 认证
-    authentication_classes = ()
+    authentication_classes = (TokenAuthentication,)
 
-    def post(self, request):
-        e_mail = request.POST.get('email')
-        email.delay(e_mail)
-        return Response('ok')
+    def get(self, request):
+
+        return Response()
+
+
+
+
+

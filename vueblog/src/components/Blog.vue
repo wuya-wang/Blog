@@ -56,17 +56,19 @@
           <div class="comment" style="padding: 0 .5rem .5rem .5rem">
             <div v-for="(comments, index) in article_data.comments_data" :key="index">
               <div class="clearfix">
-                <span v-text="comments.user"></span>
-                <p v-text="comments.text"></p>
+                <span v-text="comments.user" style="color: #2496e2"></span><span>:</span>
+                <p class="comments" v-text="comments.text"></p>
                 <p class="reply" @click="replyComments(comments.id, comments.user)">回复</p>
               </div>
               <div v-for="(comments_child, children_index) in comments.children" :key="children_index">
-                <p>{{ comments_child.user }} 回复@ {{ comments_child.father }}:</p>
-                <span style="margin-left: 2rem">{{ comments_child.text }}</span>
+                <p><span style="color: #2496e2;">{{ comments_child.user }}</span>
+                  <span class="comments">回复@</span>
+                  <span style="color: #2496e2;">{{ comments_child.father }}</span>:</p>
+                <span class="comments" style="margin-left: 2rem">{{ comments_child.text }}</span>
                 <span class="reply" style="padding-top: 3px" @click="replyComments(comments_child.id, comments_child.user)">回复</span>
                 <div v-for="(comments_child_children, children_children_index) in comments_child.children" :key="children_children_index">
-                  <p>{{ comments_child_children.user }} 回复@ {{ comments_child_children.father }}:</p>
-                  <span style="margin-left: 2rem">{{ comments_child_children.text }}</span>
+                  <p>{{ comments_child_children.user }} <span class="comments">回复@</span> {{ comments_child_children.father }}:</p>
+                  <span class="comments" style="margin-left: 2rem">{{ comments_child_children.text }}</span>
                   <span class="reply" style="padding-top: 3px" @click="replyComments(comments_child_children.id, comments_child_children.user)">回复</span>
                 </div>
               </div>
@@ -184,12 +186,11 @@ export default {
     },
     toCollections(state){
       if (this.$store.getters.userLoginStatus) {
-        axios({
+        this.$axios({
           url:'http://127.0.0.1:9999/api/blog/v1/collection/',
           method:'post',
           data:Qs.stringify({
             article_id: this.$route.query.id,
-            token: this.$store.getters.userLoginStatus,
             state: !state,
           })
         }).then(() => {
@@ -325,6 +326,10 @@ export default {
 }
 .comment p{
   line-height: 25px;
+}
+.comments{
+  font-size: .9rem;
+  color: rgba(43, 41, 41, 0.9);
 }
 .reply{
   float: right;

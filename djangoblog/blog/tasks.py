@@ -8,6 +8,7 @@ from celery.signals import task_success
 from celery import shared_task
 from django.core.mail import send_mail
 from djangoblog.settings import EMAIL_HOST_USER
+from django.core.cache import cache
 
 
 @shared_task
@@ -17,5 +18,7 @@ def email(e_mail):
         subject='验证码',
         message=msg,
         from_email=EMAIL_HOST_USER,
-        recipient_list=[str(e_mail)]
+        recipient_list=[e_mail]
     )
+    cache.set(e_mail, msg, 30 * 60)
+    print(cache.get(e_mail))
