@@ -230,7 +230,7 @@ EMAIL_PORT = 25
 # 发送邮件的邮箱
 EMAIL_HOST_USER = '421405896@qq.com'
 # 在邮箱中设置的客户端授权码
-EMAIL_HOST_PASSWORD = 'xkkdwatqxqyxbjfe'
+EMAIL_HOST_PASSWORD = ''
 
 
 try:
